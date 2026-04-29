@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Settings · WAKA Foundation Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="../js/waka-data.js"></script><script src="../js/admin-shell.js"></script>
+</head>
+<body>
+<script>
+WAKA.init(); buildAdminShell('settings');
+document.getElementById('pageTitle').textContent='Settings';
+
+function render() {
+  const settings = WAKA.store.get('settings',{});
+  document.getElementById('pageContent').innerHTML = `
+  <div class="page-header"><h1>⚙️ Settings</h1><p>Configure system settings, preferences, and administrative options.</p></div>
+
+  <div class="grid-2" style="margin-bottom:24px">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px">🏢 Organization Info</div>
+      <div class="form-group"><label>Organization Name</label><input value="${settings.orgName||'WAKA Foundation'}"/></div>
+      <div class="form-group"><label>Contact Email</label><input value="${settings.contactEmail||'info@wakafoundation.org'}"/></div>
+      <div class="form-group"><label>Phone Number</label><input value="${settings.phone||'+254 700 000 000'}"/></div>
+      <div class="form-group"><label>Address</label><textarea>${settings.address||'Nairobi, Kenya'}</textarea></div>
+      <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px">👤 Account Settings</div>
+      <div class="form-group"><label>Display Name</label><input value="${WAKA.auth.getUser().name}"/></div>
+      <div class="form-group"><label>Email</label><input value="${WAKA.auth.getUser().email}" readonly/></div>
+      <div class="form-group"><label>Role</label><input value="${WAKA.auth.getUser().role}" readonly/></div>
+      <div class="form-group"><label>New Password</label><input type="password" placeholder="Leave blank to keep current"/></div>
+      <button class="btn btn-primary" onclick="saveAccount()">Update Account</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="margin-bottom:16px">🔒 Security</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--grey);border-radius:8px">
+        <div><strong>Two-Factor Authentication</strong><br/><span class="text-muted" style="font-size:.82rem">Add an extra layer of security</span></div>
+        <button class="btn btn-outline btn-sm">Enable</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--grey);border-radius:8px">
+        <div><strong>Session Timeout</strong><br/><span class="text-muted" style="font-size:.82rem">Auto-logout after inactivity</span></div>
+        <select class="filter-select"><option>30 minutes</option><option>1 hour</option><option>4 hours</option></select>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--grey);border-radius:8px">
+        <div><strong>Login History</strong><br/><span class="text-muted" style="font-size:.82rem">View recent login activity</span></div>
+        <button class="btn btn-outline btn-sm">View</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="card-title" style="margin-bottom:16px;color:var(--red)">⚠️ Danger Zone</div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div><strong>Reset All Data</strong><br/><span class="text-muted" style="font-size:.82rem">This will permanently delete all stored data</span></div>
+      <button class="btn btn-red" onclick="resetData()">Reset All Data</button>
+    </div>
+  </div>
+  `;
+}
+
+function saveSettings() {
+  WAKA.notify('Settings saved successfully!', 'success');
+}
+
+function saveAccount() {
+  WAKA.notify('Account updated successfully!', 'success');
+}
+
+function resetData() {
+  if(confirm('Are you sure you want to reset all data? This cannot be undone.')) {
+    localStorage.clear();
+    WAKA.notify('All data has been reset. Refreshing...', 'info');
+    setTimeout(() => location.reload(), 1500);
+  }
+}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Messages · WAKA Foundation Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="../js/waka-data.js"></script><script src="../js/admin-shell.js"></script>
+</head>
+<body>
+<script>
+WAKA.init(); buildAdminShell('messages');
+document.getElementById('pageTitle').textContent='Messages';
+
+function render() {
+  let msgs = WAKA.store.get('messages',[]);
+  const sF=(document.getElementById('mS')||{}).value||'';
+  let filtered = msgs.filter(m=>!sF||m.status===sF);
+
+  document.getElementById('pageContent').innerHTML = `
+  <div class="page-header"><h1>✉️ Messages & Enquiries</h1><p>All contact form submissions, volunteer applications, and partner enquiries from the website.</p></div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="top"><div><div class="label">Total</div><div class="value">${msgs.length}</div></div><div class="icon-box" style="background:var(--blue-pale)">✉️</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Unread</div><div class="value" style="color:var(--red)">${msgs.filter(m=>m.status==='unread').length}</div></div><div class="icon-box" style="background:var(--red-pale)">🔴</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Replied</div><div class="value" style="color:var(--green)">${msgs.filter(m=>m.status==='replied').length}</div></div><div class="icon-box" style="background:var(--green-pale)">✅</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">This Week</div><div class="value">${msgs.length}</div></div><div class="icon-box" style="background:var(--gold-pale)">📅</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">All Messages</span>
+      <select class="filter-select" id="mS" onchange="render()">
+        <option value="">All Status</option><option value="unread">Unread</option><option value="read">Read</option><option value="replied">Replied</option>
+      </select>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0">
+      ${filtered.map(m=>`
+      <div style="padding:18px;border-bottom:1px solid var(--border);display:flex;gap:16px;align-items:flex-start;cursor:pointer;${m.status==='unread'?'background:var(--blue-pale);':''}" onclick="openMessage('${m.id}')">
+        <div style="width:42px;height:42px;border-radius:50%;background:${m.status==='unread'?'var(--blue)':'var(--grey)'};color:${m.status==='unread'?'#fff':'var(--muted)'};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;flex-shrink:0">${m.name.charAt(0)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:8px">
+            <span style="font-weight:${m.status==='unread'?'700':'600'};color:var(--ink)">${m.name}</span>
+            <div class="flex gap-2">
+              <span class="badge ${m.status==='unread'?'badge-red':m.status==='replied'?'badge-green':'badge-grey'}">${m.status}</span>
+              <span class="text-muted" style="font-size:.78rem">${WAKA.fmt.date(m.date)}</span>
+            </div>
+          </div>
+          <div style="font-size:.88rem;font-weight:600;color:var(--ink)">${m.subject}</div>
+          <div style="font-size:.82rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px">${m.message}</div>
+          <div style="margin-top:6px"><span class="badge badge-blue">${m.intent}</span> <span class="text-muted" style="font-size:.75rem;margin-left:6px">${m.email}</span></div>
+        </div>
+      </div>`).join('')}
+      ${filtered.length===0?`<div class="empty-state"><div class="icon">✉️</div><p>No messages found.</p></div>`:''}
+    </div>
+  </div>
+  `;
+}
+
+function openMessage(id) {
+  let msgs=WAKA.store.get('messages',[]);
+  const m=msgs.find(x=>x.id===id);
+  if(!m)return;
+  // Mark as read
+  msgs=msgs.map(x=>x.id===id&&x.status==='unread'?{...x,status:'read'}:x);
+  WAKA.store.set('messages',msgs);
+  openGlobalModal(`
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700">${m.name.charAt(0)}</div>
+      <div><h2 style="margin:0;font-size:1.2rem">${m.name}</h2><div style="font-size:.83rem;color:var(--muted)">${m.email} · ${m.phone||'No phone'}</div></div>
+    </div>
+    <div class="divider"></div>
+    <div style="background:var(--grey);border-radius:10px;padding:16px;margin-bottom:16px">
+      <div style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Subject: ${m.subject}</div>
+      <p style="font-size:.92rem;line-height:1.7">${m.message}</p>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <span class="badge badge-blue">${m.intent}</span>
+      <span class="text-muted">${WAKA.fmt.date(m.date)}</span>
+    </div>
+    <div class="form-group"><label>Reply</label><textarea id="replyText" placeholder="Type your reply..." style="min-height:120px"></textarea></div>
+    <div class="flex gap-2">
+      <button class="btn btn-outline" onclick="closeGlobalModal();render()">Close</button>
+      <button class="btn btn-primary" onclick="sendReply('${m.id}')">📤 Send Reply</button>
+      ${m.intent==='Volunteer'?`<button class="btn btn-green" onclick="approveVolunteer('${m.id}')">✓ Approve Volunteer</button>`:''}
+    </div>
+  `);
+}
+
+function sendReply(id) {
+  const txt=document.getElementById('replyText')?.value;
+  if(!txt){WAKA.notify('Please write a reply','error');return;}
+  let msgs=WAKA.store.get('messages',[]);
+  msgs=msgs.map(x=>x.id===id?{...x,status:'replied'}:x);
+  WAKA.store.set('messages',msgs);
+  closeGlobalModal();
+  WAKA.notify('Reply sent successfully!','success');
+  render();
+}
+
+function approveVolunteer(id) {
+  const m=WAKA.store.get('messages',[]).find(x=>x.id===id);
+  let vols=WAKA.store.get('volunteers',[]);
+  vols.push({id:'V'+String(Date.now()).slice(-4),name:m.name,email:m.email,phone:m.phone||'',skill:'General',availability:'TBD',county:'Nairobi',status:'active',joinDate:new Date().toISOString().split('T')[0],hours:0,tasks:[]});
+  WAKA.store.set('volunteers',vols);
+  closeGlobalModal();
+  WAKA.notify(`${m.name} added as volunteer!`,'success');
+  render();
+}
+render();
+</script>
+</body>
+</html>

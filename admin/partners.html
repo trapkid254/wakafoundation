@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Partners · WAKA Foundation Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="../js/waka-data.js"></script><script src="../js/admin-shell.js"></script>
+</head>
+<body>
+<script>
+WAKA.init(); buildAdminShell('partners');
+document.getElementById('pageTitle').textContent='Partners';
+
+function render() {
+  const partners = WAKA.store.get('partners',[]);
+  document.getElementById('pageContent').innerHTML = `
+  <div class="page-header"><h1>🤝 Partners & Sponsors</h1><p>Manage organizational partnerships, sponsorships, and collaborations.</p></div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="top"><div><div class="label">Total</div><div class="value">${partners.length}</div></div><div class="icon-box" style="background:var(--blue-pale)">🤝</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Active</div><div class="value" style="color:var(--green)">${partners.filter(p=>p.status==='active').length}</div></div><div class="icon-box" style="background:var(--green-pale)">✅</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Pending</div><div class="value" style="color:var(--gold)">${partners.filter(p=>p.status==='pending').length}</div></div><div class="icon-box" style="background:var(--gold-pale)">⏳</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Total Value</div><div class="value">KES ${(partners.reduce((s,p)=>s+(p.value||0),0)/1000000).toFixed(1)}M</div></div><div class="icon-box" style="background:var(--gold-pale)">💰</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">All Partners</span>
+      <button class="btn btn-primary btn-sm" onclick="openAdd()">+ Add Partner</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Logo</th><th>Organization</th><th>Type</th><th>Contact</th><th>Value</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${partners.map(p=>`
+          <tr>
+            <td>${p.logo?`<img src="${p.logo}" alt="${p.name}" style="width:48px;height:48px;border-radius:8px;object-fit:cover"/>`:`<div style="width:48px;height:48px;border-radius:8px;background:var(--grey);display:flex;align-items:center;justify-content:center;font-size:1.2rem">🏢</div>`}</td>
+            <td><strong>${p.name}</strong><br/><span class="text-muted">${p.sector||'—'}</span></td>
+            <td><span class="badge badge-blue">${p.type}</span></td>
+            <td>${p.contact||'—'}</td>
+            <td class="fw-bold">${p.value?WAKA.fmt.currency(p.value):'—'}</td>
+            <td><span class="badge ${p.status==='active'?'badge-green':p.status==='pending'?'badge-gold':'badge-grey'}">${p.status}</span></td>
+            <td>
+              <div class="flex gap-2">
+                <button class="btn btn-outline btn-icon btn-sm" onclick="viewP('${p.id}')">👁</button>
+                <button class="btn btn-outline btn-icon btn-sm" onclick="editP('${p.id}')">✏</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    ${partners.length===0?`<div class="empty-state"><div class="icon">🤝</div><p>No partners found.</p></div>`:''}
+  </div>
+  `;
+}
+function openAdd(existing) {
+  const p = existing || {};
+  openGlobalModal(`
+    <h2>${p.id?'Edit':'Add'} Partner</h2>
+    <p>${p.id?'Update partner information.':'Register a new partner or sponsor.'}</p>
+    <div class="form-group"><label>Organization Name *</label><input id="p_name" value="${p.name||''}"/></div>
+    <div class="form-group"><label>Logo URL</label><input id="p_logo" value="${p.logo||''}" placeholder="https://example.com/logo.png"/></div>
+    <div class="form-row">
+      <div class="form-group"><label>Type</label><select id="p_type"><option>Sponsor</option><option>Partner</option><option>Grant Provider</option><option>Corporate</option><option>NGO</option></select></div>
+      <div class="form-group"><label>Sector</label><input id="p_sector" value="${p.sector||''}" placeholder="e.g., Education, Healthcare, Technology"/></div>
+    </div>
+    <div class="form-group"><label>Contact Person</label><input id="p_contact" value="${p.contact||''}"/></div>
+    <div class="form-row">
+      <div class="form-group"><label>Email</label><input id="p_email" value="${p.email||''}"/></div>
+      <div class="form-group"><label>Phone</label><input id="p_phone" value="${p.phone||''}"/></div>
+    </div>
+    <div class="form-group"><label>Partnership Value (KES)</label><input id="p_value" type="number" value="${p.value||''}"/></div>
+    <div class="form-group"><label>Status</label><select id="p_status"><option value="active" ${p.status==='active'?'selected':''}>Active</option><option value="pending" ${p.status==='pending'?'selected':''}>Pending</option><option value="inactive">Inactive</option></select></div>
+    <div class="flex gap-2 mt-2">
+      <button class="btn btn-outline" onclick="closeGlobalModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveP('${p.id||''}')">Save Partner</button>
+    </div>
+  `);
+  if(p.type) { const s=document.getElementById('p_type'); if(s) for(let i=0;i<s.options.length;i++) if(s.options[i].value===p.type) s.selectedIndex=i; }
+}
+
+function saveP(existingId) {
+  const name=document.getElementById('p_name')?.value;
+  if(!name){WAKA.notify('Organization name is required','error');return;}
+  let partners=WAKA.store.get('partners',[]);
+  const newEntry={
+    id:existingId||'P'+String(Date.now()).slice(-4),
+    name,
+    logo:document.getElementById('p_logo')?.value,
+    type:document.getElementById('p_type')?.value,
+    sector:document.getElementById('p_sector')?.value,
+    contact:document.getElementById('p_contact')?.value,
+    email:document.getElementById('p_email')?.value,
+    phone:document.getElementById('p_phone')?.value,
+    value:parseInt(document.getElementById('p_value')?.value)||0,
+    status:document.getElementById('p_status')?.value,
+    joined:existingId?partners.find(x=>x.id===existingId)?.joined:new Date().toISOString().split('T')[0]
+  };
+  if(existingId) partners=partners.map(x=>x.id===existingId?newEntry:x);
+  else partners.unshift(newEntry);
+  WAKA.store.set('partners',partners);
+  closeGlobalModal();
+  WAKA.notify(existingId?'Partner updated!':'Partner added!','success');
+  render();
+}
+
+function viewP(id) {
+  const p=WAKA.store.get('partners',[]).find(x=>x.id===id);
+  if(!p)return;
+  openGlobalModal(`
+    <div style="text-align:center;margin-bottom:20px">
+      ${p.logo?`<img src="${p.logo}" alt="${p.name}" style="width:80px;height:80px;border-radius:12px;object-fit:cover;margin-bottom:12px"/>`:`<div style="width:80px;height:80px;border-radius:12px;background:var(--grey);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 12px">🏢</div>`}
+      <h2>${p.name}</h2>
+      <p class="text-muted">${p.type} · ${p.sector||'—'}</p>
+    </div>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div><strong>Contact:</strong> ${p.contact||'—'}</div>
+      <div><strong>Email:</strong> ${p.email||'—'}</div>
+      <div><strong>Phone:</strong> ${p.phone||'—'}</div>
+      <div><strong>Status:</strong> <span class="badge ${p.status==='active'?'badge-green':p.status==='pending'?'badge-gold':'badge-grey'}">${p.status}</span></div>
+      <div><strong>Value:</strong> ${p.value?WAKA.fmt.currency(p.value):'—'}</div>
+      <div><strong>Joined:</strong> ${WAKA.fmt.date(p.joined)}</div>
+    </div>
+    <div class="flex gap-2" style="margin-top:16px">
+      <button class="btn btn-outline" onclick="closeGlobalModal()">Close</button>
+      <button class="btn btn-primary" onclick="closeGlobalModal();editP('${p.id}')">✏ Edit</button>
+    </div>
+  `);
+}
+
+function editP(id) {
+  openAdd(WAKA.store.get('partners',[]).find(x=>x.id===id));
+}
+
+render();
+</script>
+</body>
+</html>

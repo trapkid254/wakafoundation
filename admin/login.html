@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>WAKA Foundation · Admin Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0d1b2a;--blue:#1a56a0;--blue-light:#2e7dd4;--blue-pale:#e8f1fb;
+  --green:#2e9e5b;--green-light:#3dbd70;--green-pale:#e6f7ee;
+  --gold:#f0a500;--white:#fff;--grey:#f5f6f8;--text:#374151;
+  --muted:#6b7280;--border:#e5e7eb;--red:#ef4444;
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'DM Sans',system-ui,sans-serif;
+}
+body{font-family:var(--font-body);background:linear-gradient(135deg,#0d1b2a 0%,#1a3a5c 50%,#0f2d1a 100%);min-height:100vh;padding:20px;position:relative;overflow-y:auto}
+body::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.03)' stroke-width='1'%3E%3Cpath d='M60 0L0 0 0 60'/%3E%3C/g%3E%3C/svg%3E")}
+.glow{position:absolute;border-radius:50%;filter:blur(80px);opacity:.15}
+.glow-1{width:500px;height:500px;background:#1a56a0;top:-100px;right:-100px}
+.glow-2{width:400px;height:400px;background:#2e9e5b;bottom:-80px;left:-80px}
+.login-wrap{position:relative;z-index:1;width:100%;max-width:900px;margin:40px auto;display:flex;align-items:center;gap:40px}
+.logo-area{text-align:center;flex:1}
+.logo-area img{width:180px;height:180px;border-radius:18px;margin:0 auto 20px;box-shadow:0 8px 32px rgba(26,86,160,.4)}
+.logo-area h1{font-family:var(--font-display);color:#fff;font-size:2.5rem;font-weight:900}
+.logo-area p{color:rgba(255,255,255,.55);font-size:1.1rem;margin-top:8px}
+.card{background:#fff;border-radius:20px;padding:40px;box-shadow:0 24px 80px rgba(0,0,0,.35);flex:1}
+.card h2{font-family:var(--font-display);font-size:1.5rem;color:var(--ink);margin-bottom:6px}
+.card>p{font-size:.88rem;color:var(--muted);margin-bottom:28px}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;font-size:.85rem;font-weight:600;color:var(--ink);margin-bottom:8px}
+.input-wrap{position:relative}
+.input-wrap input{width:100%;padding:13px 44px 13px 16px;border:2px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:.95rem;color:var(--ink);outline:none;transition:.2s;background:var(--grey)}
+.input-wrap input:focus{border-color:var(--blue);background:#fff}
+.input-wrap .icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:1.1rem;cursor:pointer;color:var(--muted)}
+.toggle-pw{cursor:pointer;user-select:none}
+.btn-login{width:100%;padding:14px;background:linear-gradient(135deg,var(--blue),var(--green));color:#fff;border:none;border-radius:10px;font-family:var(--font-body);font-size:1rem;font-weight:600;cursor:pointer;transition:.25s;margin-top:8px;position:relative;overflow:hidden}
+.btn-login:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(26,86,160,.4)}
+.btn-login:active{transform:translateY(0)}
+.btn-login .spinner{display:none;width:18px;height:18px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.extras{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+.remember{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted);cursor:pointer}
+.remember input{accent-color:var(--blue)}
+.forgot{font-size:.85rem;color:var(--blue);font-weight:600}
+.divider{display:flex;align-items:center;gap:12px;margin:24px 0;color:var(--muted);font-size:.82rem}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.demo-creds{background:var(--grey);border-radius:10px;padding:14px;font-size:.82rem;color:var(--muted);border:1px solid var(--border)}
+.demo-creds strong{color:var(--ink);display:block;margin-bottom:6px}
+.demo-creds code{background:#fff;border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:.8rem;color:var(--blue)}
+.error-msg{background:#fef2f2;border:1px solid #fecaca;color:var(--red);border-radius:8px;padding:12px 16px;font-size:.88rem;margin-bottom:16px;display:none}
+.back-link{text-align:center;margin-top:20px}
+.back-link a{color:rgba(255,255,255,.6);font-size:.85rem;transition:.2s}
+.back-link a:hover{color:#fff}
+.role-select{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.role-btn{padding:10px;border:2px solid var(--border);border-radius:8px;background:#fff;font-family:var(--font-body);font-size:.85rem;font-weight:600;cursor:pointer;transition:.2s;text-align:center;color:var(--muted)}
+.role-btn.active{border-color:var(--blue);background:var(--blue-pale);color:var(--blue)}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+.role-card{padding:24px;border:2px solid var(--border);border-radius:12px;background:#fff;font-family:var(--font-body);font-size:.9rem;font-weight:600;cursor:pointer;transition:.2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+.role-card:hover{border-color:var(--blue);background:var(--blue-pale);transform:translateY(-2px)}
+.role-icon{font-size:2.5rem}
+.role-name{color:var(--ink);font-size:1rem}
+.role-desc{color:var(--muted);font-size:.8rem;font-weight:400}
+.back-btn{background:none;border:none;color:var(--muted);font-size:.85rem;cursor:pointer;padding:0;margin-bottom:16px;display:flex;align-items:center;gap:4px;transition:.2s}
+.back-btn:hover{color:var(--blue)}
+.security-badge{display:flex;align-items:center;gap:8px;background:var(--green-pale);border-radius:8px;padding:10px 14px;margin-top:16px;font-size:.8rem;color:var(--green);font-weight:500}
+@media(max-width:768px){
+  .login-wrap{flex-direction:column;max-width:440px}
+  .logo-area{margin-bottom:20px}
+}
+</style>
+</head>
+<body>
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+
+<div class="login-wrap">
+  <div class="logo-area">
+    <img src="../images/waka logo.png" alt="WAKA Foundation Logo" style="width:80px;height:80px;border-radius:18px;margin:0 auto 16px;box-shadow:0 8px 32px rgba(26,86,160,.4)"/>
+    <h1>WAKA Foundation</h1>
+    <p>Admin Control Panel · Secure Access</p>
+  </div>
+
+  <div class="card" id="roleSelectionCard">
+    <h2>Select Your Role</h2>
+    <p>Choose your role to proceed to login</p>
+
+    <div class="role-grid">
+      <button class="role-card" onclick="selectRole('admin')">
+        <div class="role-icon">🛡</div>
+        <div class="role-name">Super Admin</div>
+        <div class="role-desc">Full system access</div>
+      </button>
+      <button class="role-card" onclick="selectRole('manager')">
+        <div class="role-icon">📋</div>
+        <div class="role-name">Program Manager</div>
+        <div class="role-desc">Manage programs</div>
+      </button>
+      <button class="role-card" onclick="selectRole('finance')">
+        <div class="role-icon">💰</div>
+        <div class="role-name">Finance Officer</div>
+        <div class="role-desc">Financial operations</div>
+      </button>
+      <button class="role-card" onclick="selectRole('comms')">
+        <div class="role-icon">📣</div>
+        <div class="role-name">Communications</div>
+        <div class="role-desc">Content & messaging</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="card" id="loginFormCard" style="display:none">
+    <button class="back-btn" onclick="showRoleSelection()">← Back to Role Selection</button>
+    <h2 id="loginTitle">Welcome Back</h2>
+    <p id="loginSubtitle">Sign in to manage the foundation's operations</p>
+
+    <div class="error-msg" id="errorMsg">⚠ Invalid credentials. Please try again.</div>
+
+    <div class="form-group">
+      <label>Email Address</label>
+      <div class="input-wrap">
+        <input type="email" id="email" placeholder="admin@wakafoundation.org"/>
+        <span class="icon">✉️</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Password</label>
+      <div class="input-wrap">
+        <input type="password" id="password" placeholder="Enter your password"/>
+        <span class="icon toggle-pw" onclick="togglePw()">👁</span>
+      </div>
+    </div>
+
+    <div class="extras">
+      <label class="remember"><input type="checkbox" checked/> Remember me</label>
+      <a href="#" class="forgot">Forgot password?</a>
+    </div>
+
+    <button class="btn-login" onclick="doLogin()" id="loginBtn">
+      <span id="loginText">Sign In to Dashboard</span>
+      <div class="spinner" id="loginSpinner"></div>
+    </button>
+
+    <div class="security-badge">
+      🔒 256-bit SSL encrypted · Session expires in 8 hours
+    </div>
+  </div>
+
+  <div class="back-link">
+    <a href="../index.html">← Back to Public Website</a>
+  </div>
+</div>
+
+<script>
+let selectedRole='admin';
+const roleCredentials = {
+  'admin': { email: 'admin@wakafoundation.org', name: 'Waka Admin', title: 'Super Admin' },
+  'manager': { email: 'manager@wakafoundation.org', name: 'Program Manager', title: 'Program Manager' },
+  'finance': { email: 'finance@wakafoundation.org', name: 'Finance Officer', title: 'Finance Officer' },
+  'comms': { email: 'comms@wakafoundation.org', name: 'Communications Lead', title: 'Communications' }
+};
+
+function selectRole(role) {
+  selectedRole = role;
+  const creds = roleCredentials[role];
+  document.getElementById('email').value = creds.email;
+  document.getElementById('password').value = 'waka2024';
+  document.getElementById('loginTitle').textContent = `Welcome, ${creds.name}`;
+  document.getElementById('loginSubtitle').textContent = `Sign in as ${creds.title}`;
+  document.getElementById('roleSelectionCard').style.display = 'none';
+  document.getElementById('loginFormCard').style.display = 'block';
+}
+
+function showRoleSelection() {
+  document.getElementById('roleSelectionCard').style.display = 'block';
+  document.getElementById('loginFormCard').style.display = 'none';
+  document.getElementById('email').value = '';
+  document.getElementById('password').value = '';
+}
+
+function setRole(btn,role){
+  document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');selectedRole=role;
+}
+function togglePw(){
+  const p=document.getElementById('password');
+  p.type=p.type==='password'?'text':'password';
+}
+function doLogin(){
+  const email=document.getElementById('email').value;
+  const pw=document.getElementById('password').value;
+  const err=document.getElementById('errorMsg');
+  err.style.display='none';
+  if(!email||!pw){err.style.display='block';err.textContent='⚠ Please enter your email and password.';return;}
+  // Show loading
+  document.getElementById('loginText').style.display='none';
+  document.getElementById('loginSpinner').style.display='block';
+  document.getElementById('loginBtn').disabled=true;
+  setTimeout(()=>{
+    const credentials = {
+      'admin@wakafoundation.org': { role: 'admin', name: 'Waka Admin' },
+      'manager@wakafoundation.org': { role: 'manager', name: 'Program Manager' },
+      'finance@wakafoundation.org': { role: 'finance', name: 'Finance Officer' },
+      'comms@wakafoundation.org': { role: 'comms', name: 'Communications Lead' }
+    };
+    const user = credentials[email];
+    if(user && pw==='waka2024'){
+      // Save session
+      localStorage.setItem('waka_admin_logged_in','true');
+      localStorage.setItem('waka_admin_role',user.role);
+      localStorage.setItem('waka_admin_name',user.name);
+      localStorage.setItem('waka_admin_email',email);
+      window.location.href='dashboard.html';
+    } else {
+      err.style.display='block';err.textContent='⚠ Invalid credentials. Please check your email and password.';
+      document.getElementById('loginText').style.display='block';
+      document.getElementById('loginSpinner').style.display='none';
+      document.getElementById('loginBtn').disabled=false;
+    }
+  },1600);
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+// Auto-redirect if already logged in
+if(localStorage.getItem('waka_admin_logged_in')==='true')window.location.href='dashboard.html';
+</script>
+</body>
+</html>

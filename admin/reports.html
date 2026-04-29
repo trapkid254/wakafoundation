@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Reports · WAKA Foundation Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="../js/waka-data.js"></script><script src="../js/admin-shell.js"></script>
+</head>
+<body>
+<script>
+WAKA.init(); buildAdminShell('reports');
+document.getElementById('pageTitle').textContent='Reports';
+
+function render() {
+  document.getElementById('pageContent').innerHTML = `
+  <div class="page-header"><h1>📊 Reports & Analytics</h1><p>Generate financial, impact, and operational reports for stakeholders.</p></div>
+
+  <div class="grid-2" style="margin-bottom:24px">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px">💰 Financial Reports</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="generateReport('income')">Income Statement</button>
+        <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="generateReport('expense')">Expense Report</button>
+        <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="generateReport('budget')">Budget vs Actual</button>
+        <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="generateReport('donations')">Donation Summary</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px">📈 Impact Reports</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="generateReport('impact')">Impact Metrics Summary</button>
+        <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="generateReport('beneficiaries')">Beneficiary Report</button>
+        <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="generateReport('programs')">Program Performance</button>
+        <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="generateReport('counties')">County Coverage</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="margin-bottom:16px">📅 Scheduled Reports</div>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:16px">Configure automatic report generation and email delivery.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Report</th><th>Frequency</th><th>Last Run</th><th>Next Run</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Monthly Financial Summary</td>
+            <td><span class="badge badge-blue">Monthly</span></td>
+            <td class="text-muted">Apr 1, 2026</td>
+            <td class="text-muted">May 1, 2026</td>
+            <td><span class="badge badge-green">Active</span></td>
+            <td><button class="btn btn-outline btn-icon btn-sm">⚙</button></td>
+          </tr>
+          <tr>
+            <td>Quarterly Impact Report</td>
+            <td><span class="badge badge-gold">Quarterly</span></td>
+            <td class="text-muted">Jan 1, 2026</td>
+            <td class="text-muted">Apr 1, 2026</td>
+            <td><span class="badge badge-green">Active</span></td>
+            <td><button class="btn btn-outline btn-icon btn-sm">⚙</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  `;
+}
+
+function generateReport(type) {
+  WAKA.notify(`Generating ${type} report... This feature is under development.`, 'info');
+}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Beneficiaries · WAKA Foundation Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="../js/waka-data.js"></script>
+<script src="../js/admin-shell.js"></script>
+</head>
+<body>
+<script>
+WAKA.init();
+buildAdminShell('beneficiaries');
+document.getElementById('pageTitle').textContent = 'Beneficiaries';
+
+function render() {
+  let list = WAKA.store.get('beneficiaries', []);
+  const q = (document.getElementById('bQ')||{}).value||'';
+  const pF = (document.getElementById('bP')||{}).value||'';
+  const sF = (document.getElementById('bS')||{}).value||'';
+  let filtered = list.filter(b=>{
+    return (!q||b.name.toLowerCase().includes(q.toLowerCase())||b.county.toLowerCase().includes(q.toLowerCase()))
+      &&(!pF||b.program===pF)&&(!sF||b.status===sF);
+  });
+
+  document.getElementById('pageContent').innerHTML = `
+  <div class="page-header"><h1>👥 Beneficiaries</h1><p>Track all individuals and families supported by WAKA Foundation programs.</p></div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="top"><div><div class="label">Total</div><div class="value">${list.length}</div></div><div class="icon-box" style="background:var(--blue-pale)">👥</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Active</div><div class="value" style="color:var(--green)">${list.filter(b=>b.status==='active').length}</div></div><div class="icon-box" style="background:var(--green-pale)">✅</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Graduated</div><div class="value" style="color:var(--blue)">${list.filter(b=>b.status==='graduated').length}</div></div><div class="icon-box" style="background:var(--blue-pale)">🎓</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Counties</div><div class="value">${[...new Set(list.map(b=>b.county))].length}</div></div><div class="icon-box" style="background:var(--gold-pale)">📍</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">All Beneficiaries</span>
+      <div class="flex gap-2">
+        <button class="btn btn-outline btn-sm" onclick="exportBeneficiaries()">⬇ Export</button>
+        <button class="btn btn-primary btn-sm" onclick="openAdd()">+ Add Beneficiary</button>
+      </div>
+    </div>
+    <div class="filters" style="margin-bottom:18px">
+      <div class="search-bar" style="flex:1"><span>🔍</span><input id="bQ" placeholder="Search name, county..." oninput="render()"/></div>
+      <select class="filter-select" id="bP" onchange="render()">
+        <option value="">All Programs</option>
+        ${[...new Set(list.map(b=>b.program))].map(p=>`<option>${p}</option>`).join('')}
+      </select>
+      <select class="filter-select" id="bS" onchange="render()"><option value="">All Status</option><option value="active">Active</option><option value="graduated">Graduated</option><option value="paused">Paused</option></select>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Name</th><th>Age/Gender</th><th>County</th><th>Program</th><th>Status</th><th>Join Date</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${filtered.map(b=>`
+          <tr>
+            <td class="text-muted">${b.id}</td>
+            <td><strong>${b.name}</strong></td>
+            <td>${b.age} · ${b.gender}</td>
+            <td>📍 ${b.county}</td>
+            <td><span class="badge badge-blue">${b.program}</span></td>
+            <td><span class="badge ${b.status==='active'?'badge-green':b.status==='graduated'?'badge-blue':'badge-grey'}">${b.status}</span></td>
+            <td class="text-muted">${WAKA.fmt.date(b.joinDate)}</td>
+            <td>
+              <div class="flex gap-2">
+                <button class="btn btn-outline btn-icon btn-sm" onclick="viewB('${b.id}')" title="View">👁</button>
+                <button class="btn btn-outline btn-icon btn-sm" onclick="editB('${b.id}')" title="Edit">✏</button>
+                <button class="btn btn-outline btn-icon btn-sm" onclick="deleteB('${b.id}')" title="Remove" style="color:var(--red)">🗑</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    ${filtered.length===0?`<div class="empty-state"><div class="icon">👥</div><p>No beneficiaries found.</p></div>`:''}
+  </div>
+  `;
+}
+
+function openAdd(existing) {
+  const b = existing || {};
+  openGlobalModal(`
+    <h2>${b.id?'Edit':'Add'} Beneficiary</h2>
+    <p>${b.id?'Update beneficiary information.':'Register a new person or family in the program.'}</p>
+    <div class="form-row">
+      <div class="form-group"><label>Full Name *</label><input id="b_name" value="${b.name||''}"/></div>
+      <div class="form-group"><label>Age</label><input id="b_age" type="number" value="${b.age||''}"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Gender</label><select id="b_gender"><option ${b.gender==='Female'?'selected':''}>Female</option><option ${b.gender==='Male'?'selected':''}>Male</option><option>Other</option></select></div>
+      <div class="form-group"><label>County *</label><input id="b_county" value="${b.county||''}"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Program</label><select id="b_prog"><option>Education</option><option>Youth Empowerment</option><option>Health</option><option>Community Support</option><option>Poverty Reduction</option></select></div>
+      <div class="form-group"><label>Status</label><select id="b_status"><option value="active" ${b.status==='active'?'selected':''}>Active</option><option value="graduated" ${b.status==='graduated'?'selected':''}>Graduated</option><option value="paused">Paused</option></select></div>
+    </div>
+    <div class="form-group"><label>Contact</label><input id="b_contact" value="${b.contact||''}"/></div>
+    <div class="form-group"><label>Story / Notes</label><textarea id="b_story">${b.story||''}</textarea></div>
+    <div class="flex gap-2 mt-2">
+      <button class="btn btn-outline" onclick="closeGlobalModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveB('${b.id||''}')">Save Beneficiary</button>
+    </div>
+  `);
+  if(b.program) { const s=document.getElementById('b_prog'); if(s) for(let i=0;i<s.options.length;i++) if(s.options[i].value===b.program) s.selectedIndex=i; }
+}
+
+function saveB(existingId) {
+  const name=document.getElementById('b_name')?.value;
+  if(!name){WAKA.notify('Name is required','error');return;}
+  let list=WAKA.store.get('beneficiaries',[]);
+  const newEntry={
+    id:existingId||'B'+String(Date.now()).slice(-4),
+    name,age:parseInt(document.getElementById('b_age')?.value)||0,
+    gender:document.getElementById('b_gender')?.value,
+    county:document.getElementById('b_county')?.value,
+    program:document.getElementById('b_prog')?.value,
+    status:document.getElementById('b_status')?.value,
+    contact:document.getElementById('b_contact')?.value,
+    story:document.getElementById('b_story')?.value,
+    joinDate:existingId?list.find(x=>x.id===existingId)?.joinDate:new Date().toISOString().split('T')[0]
+  };
+  if(existingId) list=list.map(x=>x.id===existingId?newEntry:x);
+  else list.unshift(newEntry);
+  WAKA.store.set('beneficiaries',list);
+  closeGlobalModal();
+  WAKA.notify(existingId?'Beneficiary updated!':'Beneficiary added!','success');
+  render();
+}
+
+function viewB(id) {
+  const b=WAKA.store.get('beneficiaries',[]).find(x=>x.id===id);
+  if(!b)return;
+  openGlobalModal(`
+    <h2>${b.name}</h2>
+    <p>${b.program} · ${b.county} County</p>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div><strong>Age:</strong> ${b.age}</div><div><strong>Gender:</strong> ${b.gender}</div>
+      <div><strong>Status:</strong> <span class="badge ${b.status==='active'?'badge-green':'badge-blue'}">${b.status}</span></div>
+      <div><strong>Joined:</strong> ${WAKA.fmt.date(b.joinDate)}</div>
+      <div><strong>Contact:</strong> ${b.contact||'—'}</div>
+    </div>
+    <div style="margin-top:16px;background:var(--grey);border-radius:10px;padding:16px">
+      <strong>Story:</strong>
+      <p style="margin-top:8px;font-size:.9rem">${b.story||'No story recorded.'}</p>
+    </div>
+    <div class="flex gap-2" style="margin-top:16px">
+      <button class="btn btn-outline" onclick="closeGlobalModal()">Close</button>
+      <button class="btn btn-primary" onclick="closeGlobalModal();openAdd(WAKA.store.get('beneficiaries',[]).find(x=>x.id==='${b.id}'))">✏ Edit</button>
+    </div>
+  `);
+}
+
+function editB(id) {
+  openAdd(WAKA.store.get('beneficiaries',[]).find(x=>x.id===id));
+}
+
+function deleteB(id) {
+  if(!confirm('Remove this beneficiary?')) return;
+  WAKA.store.set('beneficiaries',WAKA.store.get('beneficiaries',[]).filter(x=>x.id!==id));
+  WAKA.notify('Beneficiary removed.','info');
+  render();
+}
+
+function exportBeneficiaries() {
+  const list=WAKA.store.get('beneficiaries',[]);
+  const csv=['ID,Name,Age,Gender,County,Program,Status,JoinDate',
+    ...list.map(b=>`${b.id},"${b.name}",${b.age},${b.gender},${b.county},${b.program},${b.status},${b.joinDate}`)
+  ].join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='beneficiaries.csv';a.click();
+}
+
+render();
+</script>
+</body>
+</html>

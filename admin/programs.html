@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Programs · WAKA Foundation Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="../js/waka-data.js"></script><script src="../js/admin-shell.js"></script>
+</head>
+<body>
+<script>
+WAKA.init(); buildAdminShell('programs');
+document.getElementById('pageTitle').textContent='Programs';
+
+function render() {
+  const programs = WAKA.store.get('programs',[]);
+  const beneficiaries = WAKA.store.get('beneficiaries',[]);
+  document.getElementById('pageContent').innerHTML = `
+  <div class="page-header"><h1>📋 Programs & Initiatives</h1><p>Manage WAKA Foundation's five core programs, budgets, and field teams.</p></div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="top"><div><div class="label">Active Programs</div><div class="value">${programs.filter(p=>p.status==='active').length}</div></div><div class="icon-box" style="background:var(--green-pale)">📋</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Total Budget</div><div class="value">KES ${(programs.reduce((s,p)=>s+p.budget,0)/1000000).toFixed(1)}M</div></div><div class="icon-box" style="background:var(--blue-pale)">💰</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Total Spent</div><div class="value">KES ${(programs.reduce((s,p)=>s+p.spent,0)/1000000).toFixed(1)}M</div></div><div class="icon-box" style="background:var(--gold-pale)">💸</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Beneficiaries</div><div class="value">${programs.reduce((s,p)=>s+p.beneficiaries,0).toLocaleString()}</div></div><div class="icon-box" style="background:var(--green-pale)">👥</div></div></div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:20px">
+    ${programs.map(p => {
+      const pct = Math.round((p.spent/p.budget)*100);
+      const bens = beneficiaries.filter(b=>b.program===p.name||b.program.includes(p.name.split(' ')[0])).length;
+      return `
+      <div class="card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="font-size:2rem">${p.icon}</div>
+            <div><h3>${p.name}</h3><span class="badge badge-green">${p.status}</span></div>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn btn-outline btn-sm" onclick="editProgram('${p.id}')">✏ Edit</button>
+          </div>
+        </div>
+        <p style="font-size:.88rem;color:var(--muted);margin-bottom:16px">${p.description}</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+          <div style="background:var(--grey);border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:1.2rem;font-weight:900;color:var(--blue)">${p.beneficiaries.toLocaleString()}</div>
+            <div style="font-size:.72rem;color:var(--muted)">Beneficiaries</div>
+          </div>
+          <div style="background:var(--grey);border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:1.2rem;font-weight:900;color:var(--green)">${p.counties.length}</div>
+            <div style="font-size:.72rem;color:var(--muted)">Counties</div>
+          </div>
+        </div>
+        <div style="margin-bottom:8px;display:flex;justify-content:space-between;font-size:.83rem">
+          <span>Budget: <strong>${WAKA.fmt.currency(p.budget)}</strong></span>
+          <span>Spent: <strong style="color:${pct>85?'var(--red)':pct>70?'var(--gold)':'var(--green)'}">${WAKA.fmt.currency(p.spent)}</strong></span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${pct>85?'var(--red)':pct>70?'var(--gold)':'var(--green)'}"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-top:6px">
+          <span>${pct}% utilized</span>
+          <span>Lead: ${p.lead}</span>
+        </div>
+        <div style="margin-top:14px">
+          <div style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Active Counties</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            ${p.counties.map(c=>`<span style="background:var(--blue-pale);color:var(--blue);padding:2px 10px;border-radius:99px;font-size:.75rem;font-weight:600">${c}</span>`).join('')}
+          </div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">Programs Budget Overview</span>
+      <button class="btn btn-primary btn-sm" onclick="openAddProgram()">+ Add Program</button>
+    </div>
+    <div class="chart-bar-wrap">
+      ${programs.map(p=>`
+      <div class="chart-bar-item">
+        <span class="chart-bar-label">${p.icon} ${p.name}</span>
+        <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round(p.spent/programs.reduce((s,x)=>s+x.spent,0)*100)}%;background:var(--blue)"></div></div>
+        <span class="chart-bar-val">${WAKA.fmt.currency(Math.round(p.spent/1000)+'K').replace('KES ','')}</span>
+      </div>`).join('')}
+    </div>
+  </div>
+  `;
+}
+
+function editProgram(id) {
+  const p=WAKA.store.get('programs',[]).find(x=>x.id===id);
+  openGlobalModal(`
+    <h2>✏ Edit Program: ${p.name}</h2>
+    <div class="form-group"><label>Description</label><textarea id="pr_desc">${p.description}</textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label>Budget (KES)</label><input id="pr_bud" type="number" value="${p.budget}"/></div>
+      <div class="form-group"><label>Amount Spent (KES)</label><input id="pr_spent" type="number" value="${p.spent}"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Beneficiaries</label><input id="pr_ben" type="number" value="${p.beneficiaries}"/></div>
+      <div class="form-group"><label>Program Lead</label><input id="pr_lead" value="${p.lead}"/></div>
+    </div>
+    <div class="form-group"><label>Status</label><select id="pr_status"><option value="active" selected>Active</option><option value="paused">Paused</option><option value="completed">Completed</option></select></div>
+    <div class="flex gap-2 mt-2">
+      <button class="btn btn-outline" onclick="closeGlobalModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProgram('${p.id}')">Save Changes</button>
+    </div>
+  `);
+}
+
+function saveProgram(id) {
+  let list=WAKA.store.get('programs',[]);
+  list=list.map(p=>p.id===id?{...p,
+    description:document.getElementById('pr_desc')?.value||p.description,
+    budget:parseFloat(document.getElementById('pr_bud')?.value)||p.budget,
+    spent:parseFloat(document.getElementById('pr_spent')?.value)||p.spent,
+    beneficiaries:parseInt(document.getElementById('pr_ben')?.value)||p.beneficiaries,
+    lead:document.getElementById('pr_lead')?.value||p.lead,
+    status:document.getElementById('pr_status')?.value||p.status
+  }:p);
+  WAKA.store.set('programs',list);
+  closeGlobalModal();
+  WAKA.notify('Program updated!','success');
+  render();
+}
+
+function openAddProgram() {
+  openGlobalModal(`
+    <h2>+ New Program</h2>
+    <div class="form-row">
+      <div class="form-group"><label>Program Name *</label><input id="npr_name"/></div>
+      <div class="form-group"><label>Icon (emoji)</label><input id="npr_icon" value="🌟" maxlength="4"/></div>
+    </div>
+    <div class="form-group"><label>Description</label><textarea id="npr_desc"></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label>Budget (KES)</label><input id="npr_bud" type="number"/></div>
+      <div class="form-group"><label>Program Lead</label><input id="npr_lead"/></div>
+    </div>
+    <div class="flex gap-2">
+      <button class="btn btn-outline" onclick="closeGlobalModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addProgram()">Add Program</button>
+    </div>
+  `);
+}
+
+function addProgram() {
+  const name=document.getElementById('npr_name')?.value;
+  if(!name){WAKA.notify('Name required','error');return;}
+  const list=WAKA.store.get('programs',[]);
+  list.push({id:'P'+String(list.length+1).padStart(3,'0'),name,icon:document.getElementById('npr_icon')?.value||'📋',
+    description:document.getElementById('npr_desc')?.value,budget:parseFloat(document.getElementById('npr_bud')?.value)||0,
+    spent:0,beneficiaries:0,status:'active',lead:document.getElementById('npr_lead')?.value,counties:[],startDate:new Date().toISOString().split('T')[0]});
+  WAKA.store.set('programs',list);
+  closeGlobalModal();WAKA.notify('Program created!','success');render();
+}
+render();
+</script>
+</body>
+</html>

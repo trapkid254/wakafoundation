@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Blog · WAKA Foundation Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="../js/waka-data.js"></script><script src="../js/admin-shell.js"></script>
+</head>
+<body>
+<script>
+WAKA.init(); buildAdminShell('blog');
+document.getElementById('pageTitle').textContent='Blog & Updates';
+
+function render() {
+  const posts = WAKA.store.get('blogPosts',[]);
+  document.getElementById('pageContent').innerHTML = `
+  <div class="page-header"><h1>📝 Blog & Updates</h1><p>Manage news, stories, and updates published on the website.</p></div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="top"><div><div class="label">Total Posts</div><div class="value">${posts.length}</div></div><div class="icon-box" style="background:var(--blue-pale)">📝</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Published</div><div class="value" style="color:var(--green)">${posts.filter(p=>p.status==='published').length}</div></div><div class="icon-box" style="background:var(--green-pale)">✅</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Drafts</div><div class="value" style="color:var(--gold)">${posts.filter(p=>p.status==='draft').length}</div></div><div class="icon-box" style="background:var(--gold-pale)">📝</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">This Month</div><div class="value">${posts.length}</div></div><div class="icon-box" style="background:var(--blue-pale)">📅</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">All Posts</span>
+      <button class="btn btn-primary btn-sm" onclick="openAdd()">+ New Post</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Title</th><th>Category</th><th>Author</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${posts.map(p=>`
+          <tr>
+            <td><strong>${p.title}</strong><br/><span class="text-muted">${p.excerpt||'—'}</span></td>
+            <td><span class="badge badge-blue">${p.category}</span></td>
+            <td>${p.author||'—'}</td>
+            <td class="text-muted">${WAKA.fmt.date(p.date)}</td>
+            <td><span class="badge ${p.status==='published'?'badge-green':p.status==='draft'?'badge-gold':'badge-grey'}">${p.status}</span></td>
+            <td>
+              <div class="flex gap-2">
+                <button class="btn btn-outline btn-icon btn-sm" onclick="viewPost('${p.id}')">👁</button>
+                <button class="btn btn-outline btn-icon btn-sm" onclick="editPost('${p.id}')">✏</button>
+                ${p.status==='draft'?`<button class="btn btn-green btn-icon btn-sm" onclick="publishPost('${p.id}')">📤</button>`:''}
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    ${posts.length===0?`<div class="empty-state"><div class="icon">📝</div><p>No blog posts found.</p></div>`:''}
+  </div>
+  `;
+}
+function openAdd(existing) {
+  const p = existing || {};
+  openGlobalModal(`
+    <h2>${p.id?'Edit':'New'} Blog Post</h2>
+    <p>${p.id?'Update this blog post.':'Create a new blog post for the website.'}</p>
+    <div class="form-group"><label>Title *</label><input id="bp_title" value="${p.title||''}"/></div>
+    <div class="form-row">
+      <div class="form-group"><label>Category</label><select id="bp_cat"><option>News</option><option>Story</option><option>Update</option><option>Event</option></select></div>
+      <div class="form-group"><label>Author</label><input id="bp_author" value="${p.author||WAKA.auth.getUser().name}"/></div>
+    </div>
+    <div class="form-group"><label>Excerpt</label><input id="bp_excerpt" value="${p.excerpt||''}" placeholder="Short summary..."/></div>
+    <div class="form-group"><label>Content</label><textarea id="bp_content" style="min-height:200px">${p.content||''}</textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label>Status</label><select id="bp_status"><option value="draft" ${p.status==='draft'?'selected':''}>Draft</option><option value="published" ${p.status==='published'?'selected':''}>Published</option></select></div>
+      <div class="form-group"><label>Featured Image URL</label><input id="bp_image" value="${p.image||''}"/></div>
+    </div>
+    <div class="flex gap-2 mt-2">
+      <button class="btn btn-outline" onclick="closeGlobalModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="savePost('${p.id||''}')">Save Post</button>
+    </div>
+  `);
+  if(p.category) { const s=document.getElementById('bp_cat'); if(s) for(let i=0;i<s.options.length;i++) if(s.options[i].value===p.category) s.selectedIndex=i; }
+}
+
+function savePost(existingId) {
+  const title=document.getElementById('bp_title')?.value;
+  if(!title){WAKA.notify('Title is required','error');return;}
+  let posts=WAKA.store.get('blogPosts',[]);
+  const newEntry={
+    id:existingId||'P'+String(Date.now()).slice(-4),
+    title,
+    category:document.getElementById('bp_cat')?.value,
+    author:document.getElementById('bp_author')?.value,
+    excerpt:document.getElementById('bp_excerpt')?.value,
+    content:document.getElementById('bp_content')?.value,
+    status:document.getElementById('bp_status')?.value,
+    image:document.getElementById('bp_image')?.value,
+    date:existingId?posts.find(x=>x.id===existingId)?.date:new Date().toISOString().split('T')[0]
+  };
+  if(existingId) posts=posts.map(x=>x.id===existingId?newEntry:x);
+  else posts.unshift(newEntry);
+  WAKA.store.set('blogPosts',posts);
+  closeGlobalModal();
+  WAKA.notify(existingId?'Post updated!':'Post created!','success');
+  render();
+}
+
+function viewPost(id) {
+  const p=WAKA.store.get('blogPosts',[]).find(x=>x.id===id);
+  if(!p)return;
+  openGlobalModal(`
+    <h2>${p.title}</h2>
+    <p class="text-muted">${p.category} · By ${p.author} · ${WAKA.fmt.date(p.date)}</p>
+    <div class="divider"></div>
+    ${p.image?`<img src="${p.image}" style="width:100%;max-height:200px;object-fit:cover;border-radius:10px;margin-bottom:16px"/>`:''}
+    <p style="font-size:.9rem;line-height:1.7">${p.content||'No content.'}</p>
+    <div class="flex gap-2" style="margin-top:16px">
+      <button class="btn btn-outline" onclick="closeGlobalModal()">Close</button>
+      <button class="btn btn-primary" onclick="closeGlobalModal();editPost('${p.id}')">✏ Edit</button>
+    </div>
+  `);
+}
+
+function editPost(id) {
+  openAdd(WAKA.store.get('blogPosts',[]).find(x=>x.id===id));
+}
+
+function publishPost(id) {
+  let posts=WAKA.store.get('blogPosts',[]);
+  posts=posts.map(x=>x.id===id?{...x,status:'published'}:x);
+  WAKA.store.set('blogPosts',posts);
+  WAKA.notify('Post published!','success');
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

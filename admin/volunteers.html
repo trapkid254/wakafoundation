@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Volunteers · WAKA Foundation Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="../js/waka-data.js"></script><script src="../js/admin-shell.js"></script>
+</head>
+<body>
+<script>
+WAKA.init(); buildAdminShell('volunteers');
+document.getElementById('pageTitle').textContent='Volunteers';
+
+function render() {
+  const volunteers = WAKA.store.get('volunteers',[]);
+  document.getElementById('pageContent').innerHTML = `
+  <div class="page-header"><h1>🙌 Volunteers</h1><p>Manage volunteer applications, assignments, and engagement.</p></div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="top"><div><div class="label">Total</div><div class="value">${volunteers.length}</div></div><div class="icon-box" style="background:var(--blue-pale)">🙌</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Active</div><div class="value" style="color:var(--green)">${volunteers.filter(v=>v.status==='active').length}</div></div><div class="icon-box" style="background:var(--green-pale)">✅</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Pending</div><div class="value" style="color:var(--gold)">${volunteers.filter(v=>v.status==='pending').length}</div></div><div class="icon-box" style="background:var(--gold-pale)">⏳</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">This Month</div><div class="value">${volunteers.length}</div></div><div class="icon-box" style="background:var(--blue-pale)">📅</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">All Volunteers</span>
+      <button class="btn btn-primary btn-sm" onclick="openAdd()">+ Add Volunteer</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Program</th><th>Skills</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${volunteers.map(v=>`
+          <tr>
+            <td><strong>${v.name}</strong><br/><span class="text-muted">${v.email}</span></td>
+            <td><span class="badge badge-blue">${v.program}</span></td>
+            <td>${v.skills||'—'}</td>
+            <td><span class="badge ${v.status==='active'?'badge-green':v.status==='pending'?'badge-gold':'badge-grey'}">${v.status}</span></td>
+            <td class="text-muted">${WAKA.fmt.date(v.joined)}</td>
+            <td>
+              <div class="flex gap-2">
+                <button class="btn btn-outline btn-icon btn-sm" onclick="viewV('${v.id}')">👁</button>
+                <button class="btn btn-outline btn-icon btn-sm" onclick="editV('${v.id}')">✏</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    ${volunteers.length===0?`<div class="empty-state"><div class="icon">🙌</div><p>No volunteers found.</p></div>`:''}
+  </div>
+  `;
+}
+function openAdd(existing) {
+  const v = existing || {};
+  openGlobalModal(`
+    <h2>${v.id?'Edit':'Add'} Volunteer</h2>
+    <p>${v.id?'Update volunteer information.':'Register a new volunteer.'}</p>
+    <div class="form-row">
+      <div class="form-group"><label>Full Name *</label><input id="v_name" value="${v.name||''}"/></div>
+      <div class="form-group"><label>Email *</label><input id="v_email" value="${v.email||''}"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Phone</label><input id="v_phone" value="${v.phone||''}"/></div>
+      <div class="form-group"><label>Program</label><select id="v_prog"><option>Education</option><option>Youth Empowerment</option><option>Health</option><option>Community Support</option><option>Poverty Reduction</option></select></div>
+    </div>
+    <div class="form-group"><label>Skills</label><input id="v_skills" value="${v.skills||''}" placeholder="e.g., Teaching, First Aid, Event Planning"/></div>
+    <div class="form-group"><label>Status</label><select id="v_status"><option value="active" ${v.status==='active'?'selected':''}>Active</option><option value="pending" ${v.status==='pending'?'selected':''}>Pending</option><option value="inactive">Inactive</option></select></div>
+    <div class="flex gap-2 mt-2">
+      <button class="btn btn-outline" onclick="closeGlobalModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveV('${v.id||''}')">Save Volunteer</button>
+    </div>
+  `);
+  if(v.program) { const s=document.getElementById('v_prog'); if(s) for(let i=0;i<s.options.length;i++) if(s.options[i].value===v.program) s.selectedIndex=i; }
+}
+
+function saveV(existingId) {
+  const name=document.getElementById('v_name')?.value;
+  const email=document.getElementById('v_email')?.value;
+  if(!name||!email){WAKA.notify('Name and email are required','error');return;}
+  let volunteers=WAKA.store.get('volunteers',[]);
+  const newEntry={
+    id:existingId||'V'+String(Date.now()).slice(-4),
+    name,email,
+    phone:document.getElementById('v_phone')?.value,
+    program:document.getElementById('v_prog')?.value,
+    skills:document.getElementById('v_skills')?.value,
+    status:document.getElementById('v_status')?.value,
+    joined:existingId?volunteers.find(x=>x.id===existingId)?.joined:new Date().toISOString().split('T')[0]
+  };
+  if(existingId) volunteers=volunteers.map(x=>x.id===existingId?newEntry:x);
+  else volunteers.unshift(newEntry);
+  WAKA.store.set('volunteers',volunteers);
+  closeGlobalModal();
+  WAKA.notify(existingId?'Volunteer updated!':'Volunteer added!','success');
+  render();
+}
+
+function viewV(id) {
+  const v=WAKA.store.get('volunteers',[]).find(x=>x.id===id);
+  if(!v)return;
+  openGlobalModal(`
+    <h2>${v.name}</h2>
+    <p class="text-muted">${v.program} · ${v.email}</p>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div><strong>Phone:</strong> ${v.phone||'—'}</div>
+      <div><strong>Status:</strong> <span class="badge ${v.status==='active'?'badge-green':v.status==='pending'?'badge-gold':'badge-grey'}">${v.status}</span></div>
+      <div><strong>Joined:</strong> ${WAKA.fmt.date(v.joined)}</div>
+      <div><strong>Skills:</strong> ${v.skills||'—'}</div>
+    </div>
+    <div class="flex gap-2" style="margin-top:16px">
+      <button class="btn btn-outline" onclick="closeGlobalModal()">Close</button>
+      <button class="btn btn-primary" onclick="closeGlobalModal();editV('${v.id}')">✏ Edit</button>
+    </div>
+  `);
+}
+
+function editV(id) {
+  openAdd(WAKA.store.get('volunteers',[]).find(x=>x.id===id));
+}
+
+render();
+</script>
+</body>
+</html>

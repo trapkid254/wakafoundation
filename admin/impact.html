@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Impact Metrics · WAKA Foundation Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="../js/waka-data.js"></script><script src="../js/admin-shell.js"></script>
+</head>
+<body>
+<script>
+WAKA.init(); buildAdminShell('impact');
+document.getElementById('pageTitle').textContent='Impact Metrics';
+
+function render() {
+  const m=WAKA.store.get('metrics',{});
+  document.getElementById('pageContent').innerHTML=`
+  <div class="page-header">
+    <h1>📈 Impact Metrics</h1>
+    <p>These numbers appear live on the public website homepage and impact section. Edit them to reflect current data.</p>
+  </div>
+
+  <div style="background:var(--gold-pale);border:1px solid #f0d080;border-radius:12px;padding:14px 20px;margin-bottom:24px;display:flex;align-items:center;gap:12px">
+    <span style="font-size:1.3rem">🌐</span>
+    <div><strong style="color:#8b6000">Live on Public Website</strong>
+    <p style="font-size:.83rem;color:#a07800;margin:2px 0 0">Any changes you save here will immediately update the numbers shown to visitors on the homepage.</p></div>
+    <a href="../index.html#impact" target="_blank" class="btn btn-gold btn-sm" style="margin-left:auto">View Live →</a>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+    ${[
+      {key:'livesImpacted',label:'Lives Impacted',icon:'🌍',desc:'Total people directly impacted by all programs',color:'var(--blue)'},
+      {key:'communities',label:'Communities Reached',icon:'🏘',desc:'Number of communities with active programs',color:'var(--green)'},
+      {key:'counties',label:'Counties Active',icon:'📍',desc:'Kenyan counties where we operate',color:'var(--gold)'},
+      {key:'fundUtilization',label:'Fund Utilization (%)',icon:'💰',desc:'Percentage of donations going directly to programs',color:'var(--green)'},
+      {key:'childrenEducation',label:'Children in Education',icon:'📚',desc:'Scholarship and school supply recipients',color:'var(--blue)'},
+      {key:'youthTrained',label:'Youth Trained',icon:'🌱',desc:'Enrolled in vocational/skills programs',color:'var(--green)'},
+      {key:'mealsServed',label:'Meals Served',icon:'🍽',desc:'Total meals provided to families in need',color:'var(--red)'},
+      {key:'clinicVisits',label:'Clinic Visits',icon:'🏥',desc:'Patients seen at mobile health clinics',color:'var(--blue)'},
+    ].map(item=>`
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div style="font-size:1.8rem">${item.icon}</div>
+        <div>
+          <div style="font-weight:700;color:var(--ink)">${item.label}</div>
+          <div style="font-size:.78rem;color:var(--muted)">${item.desc}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="font-family:var(--font-display);font-size:2rem;font-weight:900;color:${item.color};min-width:100px">${(m[item.key]||0).toLocaleString()}</div>
+        <input type="number" value="${m[item.key]||0}" id="met_${item.key}" style="flex:1;padding:10px 14px;border:2px solid var(--border);border-radius:8px;font-family:var(--font-body);font-size:1rem;outline:none" oninput="previewMetric('${item.key}',this.value,'${item.color}')"/>
+      </div>
+      <button class="btn btn-primary btn-sm" style="margin-top:12px;width:100%;justify-content:center" onclick="saveMetric('${item.key}')">💾 Save</button>
+    </div>`).join('')}
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">💾 Save All Metrics at Once</span></div>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:16px">Update all numbers simultaneously and publish to the website.</p>
+    <button class="btn btn-green" style="padding:14px 32px" onclick="saveAllMetrics()">💾 Save All & Publish to Website</button>
+  </div>
+  `;
+}
+
+function previewMetric(key,val,color) {
+  // Just visual feedback - nothing needed
+}
+
+function saveMetric(key) {
+  const m=WAKA.store.get('metrics',{});
+  const val=parseInt(document.getElementById('met_'+key)?.value)||0;
+  m[key]=val;
+  WAKA.store.set('metrics',m);
+  WAKA.notify(`${key} updated to ${val.toLocaleString()}!`,'success');
+  render();
+}
+
+function saveAllMetrics() {
+  const keys=['livesImpacted','communities','counties','fundUtilization','childrenEducation','youthTrained','mealsServed','clinicVisits'];
+  const m={};
+  keys.forEach(k=>{m[k]=parseInt(document.getElementById('met_'+k)?.value)||0;});
+  WAKA.store.set('metrics',m);
+  WAKA.notify('All impact metrics published to website! ✓','success');
+  render();
+}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Dashboard · WAKA Foundation Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="../js/waka-data.js"></script>
+<script src="../js/admin-shell.js"></script>
+</head>
+<body>
+<script>
+WAKA.init();
+buildAdminShell('dashboard');
+document.getElementById('pageTitle').textContent = 'Dashboard Overview';
+
+const user = WAKA.auth.getUser();
+const role = user.role;
+
+const donations = WAKA.store.get('donations', []);
+const beneficiaries = WAKA.store.get('beneficiaries', []);
+const volunteers = WAKA.store.get('volunteers', []);
+const programs = WAKA.store.get('programs', []);
+const messages = WAKA.store.get('messages', []);
+const finances = WAKA.store.get('finances', []);
+const metrics = WAKA.store.get('metrics', {});
+
+const totalDonated = donations.filter(d => d.status === 'completed').reduce((s, d) => {
+  let amt = d.amount;
+  if (d.currency === 'USD') amt *= 130;
+  return s + amt;
+}, 0);
+const monthlyDonors = donations.filter(d => d.frequency === 'monthly' && d.status === 'completed').length;
+const pendingDonations = donations.filter(d => d.status === 'pending').length;
+const unreadMsgs = messages.filter(m => m.status === 'unread').length;
+const totalExpenses = finances.filter(f => f.type === 'expense').reduce((s, f) => s + f.amount, 0);
+const totalIncome = finances.filter(f => f.type === 'income').reduce((s, f) => s + f.amount, 0);
+
+// Role-specific dashboard content
+let statsCards = '';
+let mainContent = '';
+
+if (role === 'admin') {
+  // Super Admin - sees everything
+  statsCards = `
+  <div class="stat-card">
+    <div class="top"><div><div class="label">Total Donations</div><div class="value">KES ${Math.round(totalDonated/1000)}K</div></div><div class="icon-box" style="background:var(--blue-pale)">�</div></div>
+    <div class="change change-up">↑ 18% vs last month</div>
+  </div>
+  <div class="stat-card">
+    <div class="top"><div><div class="label">Beneficiaries</div><div class="value">${beneficiaries.length.toLocaleString()}</div></div><div class="icon-box" style="background:var(--green-pale)">👥</div></div>
+    <div class="change change-up">↑ 3 new this week</div>
+  </div>
+  <div class="stat-card">
+    <div class="top"><div><div class="label">Monthly Donors</div><div class="value">${monthlyDonors}</div></div><div class="icon-box" style="background:var(--gold-pale)">🔁</div></div>
+    <div class="change change-up">↑ 2 new this month</div>
+  </div>
+  <div class="stat-card">
+    <div class="top"><div><div class="label">Unread Messages</div><div class="value">${unreadMsgs}</div></div><div class="icon-box" style="background:var(--red-pale)">✉️</div></div>
+    <div class="change ${unreadMsgs>0?'change-dn':'change-up'}">${unreadMsgs>0?'⚠ Needs attention':'✓ All caught up'}</div>
+  </div>`;
+  
+  mainContent = `
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;margin-bottom:24px">
+    <div class="card">
+      <div class="card-header"><span class="card-title">💳 Recent Donations</span><a href="donations.html" class="btn btn-outline btn-sm">View All</a></div>
+      <div class="table-wrap"><table><thead><tr><th>Donor</th><th>Amount</th><th>Method</th><th>Program</th><th>Status</th><th>Date</th></tr></thead><tbody>
+        ${donations.slice(0,6).map(d => `<tr><td><strong>${d.anonymous?'Anonymous':d.donor}</strong><br/><span class="text-muted">${d.email||d.phone||'—'}</span></td><td class="fw-bold">${WAKA.fmt.currency(d.amount, d.currency)}</td><td><span class="badge badge-blue">${d.method.toUpperCase()}</span></td><td>${d.program}</td><td><span class="badge ${d.status==='completed'?'badge-green':d.status==='pending'?'badge-gold':'badge-red'}">${d.status}</span></td><td class="text-muted">${WAKA.fmt.date(d.date)}</td></tr>`).join('')}
+      </tbody></table></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px"><div class="card"><div class="card-title" style="margin-bottom:14px">⚡ Quick Actions</div><div style="display:flex;flex-direction:column;gap:8px"><button class="btn btn-outline" onclick="location.href='donations.html'">💳 Record Donation</button><button class="btn btn-outline" onclick="location.href='beneficiaries.html'">👥 Add Beneficiary</button><button class="btn btn-outline" onclick="location.href='messages.html'">✉️ Reply to Messages</button><button class="btn btn-outline" onclick="location.href='reports.html'">📊 Generate Report</button></div></div></div>
+  </div>`;
+} else if (role === 'finance') {
+  // Finance Officer - sees finance stats
+  statsCards = `
+  <div class="stat-card">
+    <div class="top"><div><div class="label">Total Income</div><div class="value text-green">KES ${Math.round(totalIncome/1000)}K</div></div><div class="icon-box" style="background:var(--green-pale)">📈</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="top"><div><div class="label">Total Expenses</div><div class="value text-red">KES ${Math.round(totalExpenses/1000)}K</div></div><div class="icon-box" style="background:var(--red-pale)">�</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="top"><div><div class="label">Net Balance</div><div class="value text-blue">KES ${Math.round((totalIncome-totalExpenses)/1000)}K</div></div><div class="icon-box" style="background:var(--blue-pale)">🏦</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="top"><div><div class="label">Donations Received</div><div class="value">KES ${Math.round(totalDonated/1000)}K</div></div><div class="icon-box" style="background:var(--gold-pale)">💳</div></div>
+  </div>`;
+  
+  mainContent = `
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;margin-bottom:24px">
+    <div class="card">
+      <div class="card-header"><span class="card-title">💰 Recent Transactions</span><a href="finance.html" class="btn btn-outline btn-sm">View All</a></div>
+      <div class="table-wrap"><table><thead><tr><th>Type</th><th>Category</th><th>Amount</th><th>Date</th></tr></thead><tbody>
+        ${finances.slice(0,6).map(f => `<tr><td><span class="badge ${f.type==='income'?'badge-green':'badge-red'}">${f.type.toUpperCase()}</span></td><td>${f.category}</td><td class="fw-bold ${f.type==='income'?'text-green':'text-red'}">${WAKA.fmt.currency(f.amount)}</td><td class="text-muted">${WAKA.fmt.date(f.date)}</td></tr>`).join('')}
+      </tbody></table></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px"><div class="card"><div class="card-title" style="margin-bottom:14px">⚡ Quick Actions</div><div style="display:flex;flex-direction:column;gap:8px"><button class="btn btn-outline" onclick="location.href='finance.html'">💰 Add Transaction</button><button class="btn btn-outline" onclick="location.href='reports.html'">📊 Generate Report</button><button class="btn btn-outline" onclick="location.href='donations.html'">💳 Review Donations</button></div></div></div>
+  </div>`;
+} else if (role === 'manager') {
+  // Program Manager - sees program stats
+  statsCards = `
+  <div class="stat-card">
+    <div class="top"><div><div class="label">Active Programs</div><div class="value">${programs.filter(p=>p.status==='active').length}</div></div><div class="icon-box" style="background:var(--green-pale)">�</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="top"><div><div class="label">Total Beneficiaries</div><div class="value">${beneficiaries.length.toLocaleString()}</div></div><div class="icon-box" style="background:var(--blue-pale)">👥</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="top"><div><div class="label">Volunteers</div><div class="value">${volunteers.length}</div></div><div class="icon-box" style="background:var(--gold-pale)">🙌</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="top"><div><div class="label">Program Budget</div><div class="value">KES ${(programs.reduce((s,p)=>s+p.budget,0)/1000000).toFixed(1)}M</div></div><div class="icon-box" style="background:var(--blue-pale)">💰</div></div>
+  </div>`;
+  
+  mainContent = `
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;margin-bottom:24px">
+    <div class="card">
+      <div class="card-header"><span class="card-title">� Programs Overview</span><a href="programs.html" class="btn btn-outline btn-sm">View All</a></div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        ${programs.map(p => `<div style="padding:12px;background:var(--grey);border-radius:8px"><strong>${p.icon} ${p.name}</strong><br/><span class="text-muted" style="font-size:.85rem">${p.beneficiaries} beneficiaries · ${WAKA.fmt.currency(p.budget)} budget</span></div>`).join('')}
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px"><div class="card"><div class="card-title" style="margin-bottom:14px">⚡ Quick Actions</div><div style="display:flex;flex-direction:column;gap:8px"><button class="btn btn-outline" onclick="location.href='beneficiaries.html'">👥 Add Beneficiary</button><button class="btn btn-outline" onclick="location.href='volunteers.html'">🙌 Add Volunteer</button><button class="btn btn-outline" onclick="location.href='programs.html'">📋 Manage Programs</button></div></div></div>
+  </div>`;
+} else if (role === 'comms') {
+  // Communications - sees content stats
+  statsCards = `
+  <div class="stat-card">
+    <div class="top"><div><div class="label">Unread Messages</div><div class="value">${unreadMsgs}</div></div><div class="icon-box" style="background:var(--red-pale)">✉️</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="top"><div><div class="label">Blog Posts</div><div class="value">${WAKA.store.get('blogPosts',[]).length}</div></div><div class="icon-box" style="background:var(--blue-pale)">📝</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="top"><div><div class="label">Partners</div><div class="value">${WAKA.store.get('partners',[]).length}</div></div><div class="icon-box" style="background:var(--green-pale)">🤝</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="top"><div><div class="label">Impact Score</div><div class="value">${metrics.livesImpacted||0}</div></div><div class="icon-box" style="background:var(--gold-pale)">📈</div></div>
+  </div>`;
+  
+  mainContent = `
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;margin-bottom:24px">
+    <div class="card">
+      <div class="card-header"><span class="card-title">✉️ Recent Messages</span><a href="messages.html" class="btn btn-outline btn-sm">View All</a></div>
+      <div class="table-wrap"><table><thead><tr><th>From</th><th>Subject</th><th>Date</th></tr></thead><tbody>
+        ${messages.slice(0,5).map(m => `<tr><td><strong>${m.name}</strong></td><td>${m.subject}</td><td class="text-muted">${WAKA.fmt.date(m.date)}</td></tr>`).join('')}
+      </tbody></table></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px"><div class="card"><div class="card-title" style="margin-bottom:14px">⚡ Quick Actions</div><div style="display:flex;flex-direction:column;gap:8px"><button class="btn btn-outline" onclick="location.href='blog.html'">📝 Write Blog Post</button><button class="btn btn-outline" onclick="location.href='messages.html'">✉️ Reply to Messages</button><button class="btn btn-outline" onclick="location.href='impact.html'">📈 Update Impact</button></div></div></div>
+  </div>`;
+}
+
+document.getElementById('pageContent').innerHTML = `
+<div class="page-header">
+  <h1>Good ${new Date().getHours()<12?'Morning':'Afternoon'}, ${user.name.split(' ')[0]} 👋</h1>
+  <p>Here's what's happening at WAKA Foundation today — ${new Date().toLocaleDateString('en-KE',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</p>
+</div>
+
+${pendingDonations > 0 && (role === 'admin' || role === 'finance') ? `
+<div style="background:var(--gold-pale);border:1px solid #f0d080;border-radius:12px;padding:14px 20px;margin-bottom:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+  <span style="font-size:1.2rem">⚠️</span>
+  <div style="flex:1"><strong style="color:#8b6000">${pendingDonations} Pending Donations</strong><span style="color:#a07800;font-size:.88rem;display:block">Require confirmation or follow-up</span></div>
+  <a href="donations.html" class="btn btn-gold btn-sm">Review Now</a>
+</div>` : ''}
+
+<div class="stats-grid">${statsCards}</div>
+${mainContent}
+`;
+</script>
+</body>
+</html>

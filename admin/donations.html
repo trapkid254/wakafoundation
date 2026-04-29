@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Donations · WAKA Foundation Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="../js/waka-data.js"></script>
+<script src="../js/admin-shell.js"></script>
+</head>
+<body>
+<script>
+WAKA.init();
+buildAdminShell('donations');
+document.getElementById('pageTitle').textContent = 'Donations';
+
+function render() {
+  let donations = WAKA.store.get('donations', []);
+  const q = (document.getElementById('searchQ') || {}).value || '';
+  const statusF = (document.getElementById('statusF') || {}).value || '';
+  const methodF = (document.getElementById('methodF') || {}).value || '';
+  const freqF = (document.getElementById('freqF') || {}).value || '';
+
+  let filtered = donations.filter(d => {
+    const matchQ = !q || d.donor.toLowerCase().includes(q.toLowerCase()) || d.email.toLowerCase().includes(q.toLowerCase()) || d.reference.toLowerCase().includes(q.toLowerCase());
+    const matchS = !statusF || d.status === statusF;
+    const matchM = !methodF || d.method === methodF;
+    const matchF = !freqF || d.frequency === freqF;
+    return matchQ && matchS && matchM && matchF;
+  });
+
+  const total = filtered.filter(d=>d.status==='completed').reduce((s,d)=>s+(d.currency==='USD'?d.amount*130:d.amount),0);
+  const pending = filtered.filter(d=>d.status==='pending').length;
+  const monthly = filtered.filter(d=>d.frequency==='monthly'&&d.status==='completed').length;
+
+  document.getElementById('pageContent').innerHTML = `
+  <div class="page-header">
+    <h1>💳 Donations</h1>
+    <p>Manage all incoming donations, payment status, and donor records.</p>
+  </div>
+
+  <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+    <div class="stat-card"><div class="top"><div><div class="label">Total Received</div><div class="value">KES ${Math.round(total/1000)}K</div></div><div class="icon-box" style="background:var(--green-pale)">💰</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Total Records</div><div class="value">${filtered.length}</div></div><div class="icon-box" style="background:var(--blue-pale)">📋</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Pending</div><div class="value" style="color:var(--gold)">${pending}</div></div><div class="icon-box" style="background:var(--gold-pale)">⏳</div></div></div>
+    <div class="stat-card"><div class="top"><div><div class="label">Monthly Donors</div><div class="value">${monthly}</div></div><div class="icon-box" style="background:var(--blue-pale)">🔁</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">All Donations</span>
+      <div class="flex gap-2">
+        <button class="btn btn-outline btn-sm" onclick="exportDonations()">⬇ Export CSV</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddDonation()">+ Record Donation</button>
+      </div>
+    </div>
+    <div class="filters" style="margin-bottom:18px">
+      <div class="search-bar" style="flex:1;min-width:200px"><span>🔍</span><input id="searchQ" placeholder="Search donor, email, reference..." oninput="render()"/></div>
+      <select class="filter-select" id="statusF" onchange="render()"><option value="">All Status</option><option value="completed">Completed</option><option value="pending">Pending</option><option value="failed">Failed</option></select>
+      <select class="filter-select" id="methodF" onchange="render()"><option value="">All Methods</option><option value="mpesa">M-Pesa</option><option value="card">Card</option><option value="paypal">PayPal</option><option value="bank">Bank</option></select>
+      <select class="filter-select" id="freqF" onchange="render()"><option value="">All Types</option><option value="one-time">One-Time</option><option value="monthly">Monthly</option></select>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Donor</th><th>Amount</th><th>Method</th><th>Program</th><th>Type</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${filtered.map(d => `
+          <tr>
+            <td class="text-muted">${d.id}</td>
+            <td><strong>${d.anonymous?'🔒 Anonymous':d.donor}</strong><br/><span class="text-muted">${d.email||d.phone||'—'}</span></td>
+            <td><strong class="${d.currency==='USD'?'text-blue':'text-green'}">${WAKA.fmt.currency(d.amount,d.currency)}</strong></td>
+            <td><span class="badge ${d.method==='mpesa'?'badge-green':d.method==='paypal'?'badge-blue':d.method==='card'?'badge-orange':'badge-grey'}">${d.method.toUpperCase()}</span></td>
+            <td>${d.program}</td>
+            <td><span class="badge ${d.frequency==='monthly'?'badge-blue':'badge-grey'}">${d.frequency==='monthly'?'🔁 Monthly':'1x'}</span></td>
+            <td><span class="badge ${d.status==='completed'?'badge-green':d.status==='pending'?'badge-gold':'badge-red'}">${d.status}</span></td>
+            <td class="text-muted">${WAKA.fmt.date(d.date)}</td>
+            <td>
+              <div class="flex gap-2">
+                <button class="btn btn-outline btn-icon btn-sm" onclick="viewDonation('${d.id}')" title="View">👁</button>
+                ${d.status==='pending'?`<button class="btn btn-green btn-icon btn-sm" onclick="confirmDonation('${d.id}')" title="Confirm">✓</button>`:''}
+                <button class="btn btn-outline btn-icon btn-sm" onclick="sendReceipt('${d.id}')" title="Receipt">🧾</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    ${filtered.length===0?`<div class="empty-state"><div class="icon">💳</div><p>No donations found matching your filters.</p></div>`:''}
+  </div>
+  `;
+}
+
+function viewDonation(id) {
+  const d = WAKA.store.get('donations',[]).find(x=>x.id===id);
+  if(!d)return;
+  openGlobalModal(`
+    <h2>Donation Details</h2>
+    <p>Reference: <strong>${d.reference}</strong></p>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div><div class="form-group"><label>Donor Name</label><input value="${d.anonymous?'Anonymous':d.donor}" readonly/></div></div>
+      <div><div class="form-group"><label>Email</label><input value="${d.email||'—'}" readonly/></div></div>
+      <div><div class="form-group"><label>Phone</label><input value="${d.phone||'—'}" readonly/></div></div>
+      <div><div class="form-group"><label>Amount</label><input value="${WAKA.fmt.currency(d.amount,d.currency)}" readonly/></div></div>
+      <div><div class="form-group"><label>Payment Method</label><input value="${d.method.toUpperCase()}" readonly/></div></div>
+      <div><div class="form-group"><label>Program</label><input value="${d.program}" readonly/></div></div>
+      <div><div class="form-group"><label>Frequency</label><input value="${d.frequency}" readonly/></div></div>
+      <div><div class="form-group"><label>Status</label><input value="${d.status}" readonly/></div></div>
+      <div><div class="form-group"><label>Date</label><input value="${WAKA.fmt.date(d.date)}" readonly/></div></div>
+    </div>
+    ${d.message?`<div class="form-group"><label>Donor Message</label><textarea readonly>${d.message}</textarea></div>`:''}
+    <div class="flex gap-2" style="margin-top:16px">
+      <button class="btn btn-outline" onclick="closeGlobalModal()">Close</button>
+      <button class="btn btn-green" onclick="sendReceipt('${d.id}');closeGlobalModal()">🧾 Send Receipt</button>
+    </div>
+  `);
+}
+
+function confirmDonation(id) {
+  let donations = WAKA.store.get('donations',[]);
+  donations = donations.map(d=>d.id===id?{...d,status:'completed'}:d);
+  WAKA.store.set('donations',donations);
+  WAKA.notify('Donation confirmed successfully!','success');
+  render();
+}
+
+function sendReceipt(id) {
+  const d = WAKA.store.get('donations',[]).find(x=>x.id===id);
+  WAKA.notify(`Receipt sent to ${d?.email||'donor'}!`,'success');
+}
+
+function exportDonations() {
+  const donations = WAKA.store.get('donations',[]);
+  const csv = ['ID,Donor,Email,Phone,Amount,Currency,Method,Program,Frequency,Status,Date,Reference',
+    ...donations.map(d=>`${d.id},"${d.donor}","${d.email}","${d.phone}",${d.amount},${d.currency},${d.method},${d.program},${d.frequency},${d.status},${d.date},${d.reference}`)
+  ].join('\n');
+  const blob = new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='waka_donations.csv';a.click();
+  WAKA.notify('Donations exported as CSV!','success');
+}
+
+function openAddDonation() {
+  const programs = WAKA.store.get('programs',[]);
+  openGlobalModal(`
+    <h2>+ Record New Donation</h2>
+    <p>Manually record a donation received outside the website.</p>
+    <div class="form-row">
+      <div class="form-group"><label>Donor Name *</label><input id="nd_name" placeholder="Full name" required/></div>
+      <div class="form-group"><label>Email</label><input id="nd_email" type="email" placeholder="email@example.com"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Phone</label><input id="nd_phone" placeholder="+254..."/></div>
+      <div class="form-group"><label>Amount *</label><input id="nd_amount" type="number" placeholder="0" required/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Currency</label><select id="nd_currency"><option>KES</option><option>USD</option><option>EUR</option><option>GBP</option></select></div>
+      <div class="form-group"><label>Payment Method</label><select id="nd_method"><option value="mpesa">M-Pesa</option><option value="card">Card</option><option value="paypal">PayPal</option><option value="bank">Bank Transfer</option><option value="cash">Cash</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Program</label><select id="nd_program"><option>General</option>${programs.map(p=>`<option>${p.name}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Frequency</label><select id="nd_freq"><option value="one-time">One-Time</option><option value="monthly">Monthly</option></select></div>
+    </div>
+    <div class="form-group"><label>Reference / Transaction ID</label><input id="nd_ref" placeholder="M-Pesa code, bank ref..."/></div>
+    <div class="form-group"><label>Note</label><textarea id="nd_note" placeholder="Any additional notes..."></textarea></div>
+    <div class="flex gap-2" style="margin-top:4px">
+      <button class="btn btn-outline" onclick="closeGlobalModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDonation()">Save Donation</button>
+    </div>
+  `);
+}
+
+function saveDonation() {
+  const name=document.getElementById('nd_name')?.value;
+  const amount=parseFloat(document.getElementById('nd_amount')?.value);
+  if(!name||!amount){WAKA.notify('Please fill required fields','error');return;}
+  const donations=WAKA.store.get('donations',[]);
+  const newId='D'+String(donations.length+1).padStart(3,'0');
+  donations.unshift({
+    id:newId,donor:name,email:document.getElementById('nd_email')?.value||'',
+    phone:document.getElementById('nd_phone')?.value||'',amount,
+    currency:document.getElementById('nd_currency')?.value||'KES',
+    method:document.getElementById('nd_method')?.value||'cash',
+    program:document.getElementById('nd_program')?.value||'General',
+    frequency:document.getElementById('nd_freq')?.value||'one-time',
+    status:'completed',date:new Date().toISOString().split('T')[0],
+    reference:document.getElementById('nd_ref')?.value||'MANUAL-'+Date.now(),
+    message:document.getElementById('nd_note')?.value||'',anonymous:false
+  });
+  WAKA.store.set('donations',donations);
+  closeGlobalModal();
+  WAKA.notify('Donation recorded successfully!','success');
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
