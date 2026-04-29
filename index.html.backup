@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WAKA Will Work Foundation | Empowering Africa, One Life at a Time</title>
+<meta name="description" content="WAKA Will Work Foundation is a nonprofit empowering African communities through education, youth empowerment, health outreach, and poverty reduction. Donate today."/>
+<meta name="keywords" content="Waka Will Work Foundation, Africa NGO, donate Kenya, charity Africa, youth empowerment, education nonprofit"/>
+<meta property="og:title" content="WAKA Will Work Foundation"/>
+<meta property="og:description" content="Changing lives across Africa through education, health, and community empowerment."/>
+<meta property="og:type" content="website"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0d1b2a;
+  --blue:#1a56a0;
+  --blue-light:#2e7dd4;
+  --blue-pale:#e8f1fb;
+  --green:#2e9e5b;
+  --green-light:#3dbd70;
+  --green-pale:#e6f7ee;
+  --gold:#f0a500;
+  --gold-pale:#fff8e6;
+  --white:#ffffff;
+  --grey:#f5f6f8;
+  --text:#374151;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --radius:12px;
+  --shadow:0 4px 24px rgba(13,27,42,0.10);
+  --shadow-lg:0 12px 48px rgba(13,27,42,0.15);
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'DM Sans',system-ui,sans-serif;
+}
+[data-theme="dark"]{
+  --ink:#f5f6f8;
+  --blue:#4a9eff;
+  --blue-light:#6bb3ff;
+  --blue-pale:#1a2d3d;
+  --green:#4ade80;
+  --green-light:#6ee7a0;
+  --green-pale:#1a2d25;
+  --gold:#fbbf24;
+  --gold-pale:#2d2418;
+  --white:#1a1a2e;
+  --grey:#16213e;
+  --text:#e2e8f0;
+  --muted:#94a3b8;
+  --border:#2d3748;
+  --shadow:0 4px 24px rgba(0,0,0,0.30);
+  --shadow-lg:0 12px 48px rgba(0,0,0,0.40);
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--text);background:var(--white);line-height:1.6;overflow-x:hidden}
+
+/* ── UTILS ── */
+.container{max-width:1160px;margin:0 auto;padding:0 24px}
+.section{padding:88px 0}
+.section-sm{padding:56px 0}
+.tag{display:inline-block;background:var(--blue-pale);color:var(--blue);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:4px 14px;border-radius:99px;margin-bottom:16px}
+.tag-green{background:var(--green-pale);color:var(--green)}
+.tag-gold{background:var(--gold-pale);color:#b47800}
+h1,h2,h3,h4{font-family:var(--font-display);line-height:1.2;color:var(--ink)}
+h1{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:900}
+h2{font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:700}
+h3{font-size:1.25rem;font-weight:700}
+p{color:var(--text);font-size:1.05rem;line-height:1.75}
+a{text-decoration:none;color:inherit}
+img{max-width:100%;display:block}
+.flex{display:flex;align-items:center}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 30px;border-radius:8px;font-family:var(--font-body);font-size:1rem;font-weight:600;cursor:pointer;border:none;transition:all .2s ease;text-decoration:none}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:var(--blue-light);transform:translateY(-2px);box-shadow:0 8px 24px rgba(26,86,160,.35)}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:var(--green-light);transform:translateY(-2px);box-shadow:0 8px 24px rgba(46,158,91,.35)}
+.btn-gold{background:var(--gold);color:#fff}
+.btn-gold:hover{background:#e09900;transform:translateY(-2px)}
+.btn-outline{background:transparent;color:var(--blue);border:2px solid var(--blue)}
+.btn-outline:hover{background:var(--blue);color:#fff}
+.btn-outline-white{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.7)}
+.btn-outline-white:hover{background:#fff;color:var(--blue)}
+.btn-lg{padding:18px 40px;font-size:1.1rem}
+
+/* ── NAV ── */
+#navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(229,231,235,.6);transition:all .3s ease}
+[data-theme="dark"] #navbar{background:rgba(26,26,46,.97);border-bottom:1px solid rgba(45,55,72,.6)}
+#navbar.scrolled{box-shadow:0 2px 20px rgba(13,27,42,.1)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;max-width:1160px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:12px;font-family:var(--font-display);font-weight:900;font-size:1.3rem;color:var(--ink)}
+.logo-img{width:42px;height:42px;border-radius:10px;object-fit:contain;flex-shrink:0}
+.logo-icon{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--green));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:1.1rem;letter-spacing:-.02em;flex-shrink:0}
+.logo span{color:var(--blue)}
+.nav-links{display:flex;align-items:center;gap:6px}
+.nav-links a{padding:8px 14px;border-radius:6px;font-size:.92rem;font-weight:500;color:var(--text);transition:.2s}
+.nav-links a:hover{background:var(--grey);color:var(--blue)}
+.nav-links a.active{color:var(--blue)}
+.nav-cta{display:flex;align-items:center;gap:8px}
+.nav-social{display:flex;gap:6px;align-items:center}
+.social-icon-link{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.25s cubic-bezier(0.4,0,0.2,1);border:2px solid rgba(0,0,0,0.1);background:transparent}
+.social-icon-link:hover{transform:translateY(-2px) scale(1.08);border-color:var(--blue)}
+.social-icon-link svg{transition:.25s}
+.social-icon-link:hover svg{transform:scale(1.1)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;border:none;background:none}
+.hamburger span{display:block;width:24px;height:2px;background:var(--ink);border-radius:2px;transition:.3s}
+.mobile-menu{display:none;flex-direction:column;padding:16px 24px 24px;background:var(--white);border-top:1px solid var(--border)}
+.mobile-menu a{padding:12px 0;font-weight:500;border-bottom:1px solid var(--border);color:var(--text);font-size:1rem}
+.mobile-menu a:last-child{border-bottom:none}
+.mobile-menu-footer{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+
+/* ── DARK MODE TOGGLE ── */
+.theme-toggle{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;border:2px solid var(--border);background:var(--white);cursor:pointer;transition:.2s;color:var(--text);font-size:1.2rem}
+.theme-toggle:hover{border-color:var(--blue);color:var(--blue)}
+[data-theme="dark"] .theme-toggle{background:var(--grey);border-color:var(--border)}
+
+/* ── HERO ── */
+#home{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;background:linear-gradient(160deg,#0d1b2a 0%,#1a3a5c 50%,#0f2d1a 100%)}
+.hero-bg{position:absolute;inset:0;z-index:0}
+.hero-bg img{width:100%;height:100%;object-fit:cover;opacity:.28}
+.hero-bg video{position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;width:auto;height:auto;transform:translate(-50%,-50%);object-fit:cover;opacity:.35}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,27,42,.92) 0%,rgba(26,86,160,.4) 60%,rgba(46,158,91,.3) 100%)}
+.hero-content{position:relative;z-index:2;padding-top:100px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;padding:8px 18px;border-radius:99px;font-size:.85rem;font-weight:500;margin-bottom:28px;backdrop-filter:blur(8px)}
+.hero-badge span{width:8px;height:8px;border-radius:50%;background:var(--gold);display:block;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.hero-content h1{color:#fff;max-width:800px;margin-bottom:24px}
+.hero-content h1 em{font-style:normal;color:var(--gold)}
+.hero-content p{color:rgba(255,255,255,.82);max-width:580px;font-size:1.15rem;margin-bottom:36px}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:56px;background:rgba(255,255,255,.08);border-radius:12px;border:1px solid rgba(255,255,255,.15);overflow:hidden}
+.hero-stat{padding:20px 16px;text-align:center;backdrop-filter:blur(8px)}
+.hero-stat:not(:last-child){border-right:1px solid rgba(255,255,255,.15)}
+.hero-stat .num{font-family:var(--font-display);font-size:1.9rem;font-weight:900;color:#fff}
+.hero-stat .label{font-size:.78rem;color:rgba(255,255,255,.65);margin-top:2px;font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.hero-scroll{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);z-index:3;color:rgba(255,255,255,.5);font-size:.8rem;display:flex;flex-direction:column;align-items:center;gap:8px;animation:bounce 2.5s infinite}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+.hero-scroll::after{content:'';display:block;width:1px;height:36px;background:rgba(255,255,255,.3)}
+
+/* ── WHAT WE DO ── */
+#programs{background:var(--grey)}
+.programs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:24px;margin-top:48px}
+.program-card{background:var(--white);border-radius:var(--radius);padding:32px 24px;transition:.3s;border:1px solid var(--border);cursor:pointer}
+.program-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:var(--blue)}
+.program-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin-bottom:20px}
+.program-card h3{margin-bottom:10px;font-size:1.1rem}
+.program-card p{font-size:.9rem;color:var(--muted)}
+.program-card .learn{display:inline-flex;align-items:center;gap:4px;font-size:.85rem;font-weight:600;color:var(--blue);margin-top:16px}
+
+/* ── IMPACT NUMBERS ── */
+#impact{background:linear-gradient(135deg,var(--blue) 0%,#0f3d6e 100%);color:#fff;overflow:hidden;position:relative}
+#impact::before{content:'';position:absolute;top:-100px;right:-100px;width:400px;height:400px;border-radius:50%;background:rgba(255,255,255,.04)}
+.impact-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;position:relative;z-index:1}
+.impact-num{text-align:center;padding:24px}
+.impact-num .big{font-family:var(--font-display);font-size:clamp(2.4rem,4vw,3.5rem);font-weight:900;color:#fff;line-height:1}
+.impact-num .unit{color:var(--gold);font-size:1.8rem}
+.impact-num p{color:rgba(255,255,255,.72);font-size:.9rem;margin-top:8px;font-weight:500}
+
+/* ── STORIES ── */
+.stories-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:48px}
+.story-card{border-radius:var(--radius);overflow:hidden;background:var(--white);box-shadow:var(--shadow);transition:.3s}
+.story-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.story-img{height:220px;overflow:hidden;position:relative}
+.story-img img{width:100%;height:100%;object-fit:cover;transition:.4s}
+.story-card:hover .story-img img{transform:scale(1.06)}
+.story-img .program-tag{position:absolute;top:14px;left:14px;background:rgba(26,86,160,.9);color:#fff;font-size:.75rem;font-weight:600;padding:4px 12px;border-radius:99px}
+.story-body{padding:24px}
+.story-body h3{font-size:1.1rem;margin-bottom:8px}
+.story-body p{font-size:.9rem;color:var(--muted);line-height:1.65}
+.story-quote{font-style:italic;color:var(--blue);font-size:.92rem;border-left:3px solid var(--blue);padding-left:14px;margin-top:14px}
+
+/* ── ABOUT ── */
+#about{background:var(--white)}
+.about-img{border-radius:16px;overflow:hidden;position:relative}
+.about-img img{width:100%;height:480px;object-fit:cover}
+.about-badge{position:absolute;bottom:24px;left:24px;background:var(--white);border-radius:12px;padding:16px 20px;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:12px}
+.about-badge .icon{width:44px;height:44px;background:var(--green-pale);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.about-badge .text strong{display:block;font-weight:700;font-size:.95rem;color:var(--ink)}
+.about-badge .text span{font-size:.8rem;color:var(--muted)}
+.about-content .mission{background:var(--blue-pale);border-left:4px solid var(--blue);border-radius:0 8px 8px 0;padding:20px 24px;margin:24px 0;font-style:italic;font-size:1.05rem;color:var(--blue)}
+.values{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.value-item{display:flex;align-items:flex-start;gap:14px;padding:14px;background:var(--grey);border-radius:8px}
+.value-item .icon{font-size:1.3rem;flex-shrink:0;margin-top:2px}
+.value-item strong{display:block;font-size:.95rem;color:var(--ink)}
+.value-item p{font-size:.85rem;color:var(--muted);margin:2px 0 0}
+
+/* ── DONATE ── */
+#donate{background:var(--grey)}
+.donate-wrapper{display:grid;grid-template-columns:1fr 420px;gap:48px;align-items:start}
+.donate-card{background:var(--white);border-radius:16px;padding:36px;box-shadow:var(--shadow-lg)}
+.amount-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.amount-btn{padding:14px;border-radius:8px;border:2px solid var(--border);background:var(--white);font-family:var(--font-body);font-size:1rem;font-weight:600;cursor:pointer;transition:.2s;color:var(--ink)}
+.amount-btn:hover,.amount-btn.active{border-color:var(--blue);background:var(--blue-pale);color:var(--blue)}
+.custom-amount{width:100%;padding:14px 18px;border:2px solid var(--border);border-radius:8px;font-family:var(--font-body);font-size:1rem;margin-bottom:16px;outline:none;transition:.2s}
+.custom-amount:focus{border-color:var(--blue)}
+.frequency-tabs{display:flex;gap:0;border:2px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:24px}
+.freq-tab{flex:1;padding:12px;text-align:center;cursor:pointer;font-weight:600;font-size:.92rem;transition:.2s;border:none;background:var(--white);font-family:var(--font-body)}
+.freq-tab.active{background:var(--blue);color:#fff}
+.payment-methods{display:flex;flex-direction:column;gap:10px;margin:20px 0}
+.pay-method{display:flex;align-items:center;gap:12px;padding:14px 16px;border:2px solid var(--border);border-radius:8px;cursor:pointer;transition:.2s;font-weight:500}
+.pay-method:hover,.pay-method.selected{border-color:var(--green);background:var(--green-pale)}
+.pay-method .icon{font-size:1.4rem}
+.pay-method .label{font-size:.95rem;font-weight:600}
+.pay-method .sub{font-size:.8rem;color:var(--muted);display:block}
+.mpesa-input{background:var(--grey);border-radius:8px;padding:16px;margin-top:12px}
+.mpesa-input label{font-size:.85rem;font-weight:600;color:var(--muted);display:block;margin-bottom:8px}
+.mpesa-input input{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:6px;font-family:var(--font-body);font-size:1rem;outline:none}
+.mpesa-input input:focus{border-color:var(--green)}
+.donate-trust{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted);margin-top:16px;justify-content:center}
+.donate-sidebar h3{margin-bottom:20px}
+.money-breakdown{display:flex;flex-direction:column;gap:12px;margin:20px 0}
+.breakdown-item{display:flex;align-items:center;gap:12px}
+.breakdown-bar{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.breakdown-fill{height:100%;border-radius:4px}
+.breakdown-label{font-size:.85rem;font-weight:600;min-width:140px}
+.breakdown-pct{font-size:.85rem;font-weight:700;color:var(--ink);min-width:36px;text-align:right}
+.trust-badges{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.trust-badge{background:var(--white);border-radius:10px;padding:16px;text-align:center;box-shadow:var(--shadow)}
+.trust-badge .icon{font-size:1.6rem;margin-bottom:6px}
+.trust-badge p{font-size:.78rem;color:var(--muted);font-weight:500}
+
+/* ── CTA BANNER ── */
+.cta-banner{background:linear-gradient(135deg,var(--green) 0%,#1a7a40 100%);border-radius:20px;padding:56px;text-align:center;color:#fff;position:relative;overflow:hidden}
+.cta-banner::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;background:rgba(255,255,255,.07);border-radius:50%}
+.cta-banner::after{content:'';position:absolute;bottom:-80px;left:-40px;width:240px;height:240px;background:rgba(255,255,255,.05);border-radius:50%}
+.cta-banner h2{color:#fff;font-size:clamp(1.8rem,3vw,2.6rem);margin-bottom:14px;position:relative;z-index:1}
+.cta-banner p{color:rgba(255,255,255,.85);max-width:520px;margin:0 auto 32px;position:relative;z-index:1}
+.cta-banner .btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+
+/* ── GET INVOLVED ── */
+#involve{background:var(--white)}
+.involve-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:48px}
+.involve-card{border-radius:var(--radius);padding:32px;border:1px solid var(--border);transition:.3s;text-align:center}
+.involve-card:hover{border-color:var(--blue);box-shadow:var(--shadow)}
+.involve-icon{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 20px}
+.involve-card h3{margin-bottom:10px}
+.involve-card p{font-size:.9rem;color:var(--muted);margin-bottom:20px}
+
+/* ── BLOG ── */
+#blog{background:var(--grey)}
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:48px}
+.blog-card{background:var(--white);border-radius:var(--radius);overflow:hidden;transition:.3s;box-shadow:var(--shadow)}
+.blog-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.blog-img{height:180px;overflow:hidden}
+.blog-img img{width:100%;height:100%;object-fit:cover;transition:.4s}
+.blog-card:hover .blog-img img{transform:scale(1.06)}
+.blog-body{padding:22px}
+.blog-meta{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted);margin-bottom:10px}
+.blog-body h3{font-size:1rem;margin-bottom:8px;line-height:1.4}
+.blog-body p{font-size:.85rem;color:var(--muted);line-height:1.6}
+.blog-body a{display:inline-flex;align-items:center;gap:4px;font-size:.85rem;font-weight:600;color:var(--blue);margin-top:12px}
+
+/* ── PARTNERS ── */
+#partners{background:var(--white)}
+.partners-strip{display:flex;align-items:center;justify-content:center;gap:48px;flex-wrap:wrap;margin-top:40px;opacity:.7}
+.partner-logo{font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--muted);letter-spacing:.02em;padding:12px 24px;border:2px solid var(--border);border-radius:8px;transition:.2s}
+.partner-logo:hover{opacity:1;color:var(--blue);border-color:var(--blue)}
+
+/* ── CONTACT ── */
+#contact{background:var(--grey)}
+.contact-grid{display:grid;grid-template-columns:1fr 480px;gap:56px;align-items:start}
+.contact-info{display:flex;flex-direction:column;gap:24px}
+.contact-item{display:flex;align-items:flex-start;gap:16px}
+.contact-item .icon{width:44px;height:44px;background:var(--blue-pale);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.contact-item strong{display:block;font-weight:700;margin-bottom:4px}
+.contact-item p{font-size:.9rem;color:var(--muted);margin:0}
+.contact-form{background:var(--white);border-radius:16px;padding:36px;box-shadow:var(--shadow)}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:.88rem;font-weight:600;color:var(--ink);margin-bottom:8px}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:8px;font-family:var(--font-body);font-size:.95rem;outline:none}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--blue)}
+.form-group textarea{resize:vertical;min-height:120px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* ── FOOTER ── */
+footer{background:var(--ink);color:#fff;padding:64px 0 32px}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px}
+.footer-brand .logo{margin-bottom:14px}
+.footer-brand .logo .logo-icon{background:linear-gradient(135deg,var(--blue-light),var(--green))}
+.footer-brand p{font-size:.88rem;color:rgba(255,255,255,.6);line-height:1.7;max-width:280px}
+.footer-social{display:flex;gap:10px;margin-top:20px}
+.social-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.25s cubic-bezier(0.4,0,0.2,1);cursor:pointer;border:2px solid rgba(255,255,255,.3);background:transparent}
+.social-btn:hover{transform:translateY(-2px) scale(1.08);border-color:var(--green-light)}
+.social-btn svg{transition:.25s}
+.social-btn:hover svg{transform:scale(1.1)}
+.footer-col h4{font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:16px;color:#fff}
+.footer-col a{display:block;font-size:.88rem;color:rgba(255,255,255,.55);margin-bottom:10px;transition:.2s}
+.footer-col a:hover{color:#fff}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.footer-bottom p{font-size:.83rem;color:rgba(255,255,255,.45)}
+.footer-bottom .links{display:flex;gap:20px}
+.footer-bottom .links a{font-size:.83rem;color:rgba(255,255,255,.45);transition:.2s}
+.footer-bottom .links a:hover{color:#fff}
+
+/* ── MODAL OVERLAY ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(13,27,42,.85);z-index:2000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:16px;padding:40px;max-width:480px;width:100%;position:relative;max-height:90vh;overflow-y:auto}
+.modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border:none;background:var(--grey);border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center}
+.modal h3{margin-bottom:6px}
+.modal p{font-size:.9rem;color:var(--muted);margin-bottom:24px}
+.success-icon{width:64px;height:64px;background:var(--green-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 20px}
+.modal-lg{max-width:700px}
+.modal-content h4{font-size:1.2rem;margin-bottom:12px;color:var(--ink)}
+.modal-content p{font-size:.95rem;color:var(--text);line-height:1.7;margin-bottom:16px}
+.modal-content ul{margin-left:20px;margin-bottom:16px}
+.modal-content li{font-size:.95rem;color:var(--text);margin-bottom:8px}
+
+/* ── HERO CANVAS BG ── */
+#hero-canvas{position:absolute;inset:0;z-index:1;opacity:.4}
+
+/* Animated counter */
+.counter{display:inline-block}
+
+/* ── SCROLL ANIMATIONS ── */
+.fade-up{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1024px){
+  .grid-2,.donate-wrapper,.contact-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .impact-grid{grid-template-columns:repeat(2,1fr)}
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .hero-stat:nth-child(2){border-right:none}
+  .hero-stat:nth-child(1),.hero-stat:nth-child(2){border-bottom:1px solid rgba(255,255,255,.15)}
+}
+@media(max-width:768px){
+  .section{padding:60px 0}
+  .nav-links,.nav-cta .btn-outline{display:none}
+  .nav-cta{gap:6px}
+  .nav-social{display:none}
+  .theme-toggle{display:flex}
+  .hamburger{display:flex}
+  .stories-grid,.blog-grid,.involve-grid,.grid-3,.programs-grid{grid-template-columns:1fr}
+  .impact-grid{grid-template-columns:repeat(2,1fr)}
+  .footer-grid{grid-template-columns:1fr}
+  .amount-grid{grid-template-columns:repeat(2,1fr)}
+  .form-row{grid-template-columns:1fr}
+  .trust-badges{grid-template-columns:1fr 1fr}
+  .cta-banner{padding:36px 24px}
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .partners-strip{gap:20px}
+  .grid-4{grid-template-columns:repeat(2,1fr)}
+  .nav-cta .btn-primary{padding:8px 16px;font-size:.85rem}
+}
+@media(max-width:480px){
+  .hero-stats{grid-template-columns:1fr 1fr}
+  .impact-grid{grid-template-columns:1fr 1fr}
+  .btn-lg{padding:15px 28px;font-size:1rem}
+  .donate-card{padding:24px}
+  .contact-form{padding:24px}
+  .container{padding:0 16px}
+  .section{padding:48px 0}
+  .hero-content h1{font-size:2rem}
+  .hero-content p{font-size:1rem}
+  .program-card{padding:24px 20px}
+  .nav-inner{padding:12px 16px}
+  .logo-img{width:36px;height:36px}
+  .logo{font-size:1.1rem}
+  .footer-brand .logo img{width:40px;height:40px}
+  .footer-social{gap:8px}
+  .social-btn{width:36px;height:36px}
+}
+@media(max-width:360px){
+  .hero-btns{flex-direction:column}
+  .hero-btns .btn{width:100%;justify-content:center}
+  .hero-stats{grid-template-columns:1fr}
+  .hero-stat{border-right:none;border-bottom:1px solid rgba(255,255,255,.15)}
+  .hero-stat:last-child{border-bottom:none}
+}
+
+// Update active link
+const sections = document.querySelectorAll('section[id]');
+let current='';
+sections.forEach(s=>{if(window.scrollY>=s.offsetTop-100)current=s.id});
+document.querySelectorAll('.nav-links a').forEach(a=>{
+  a.classList.toggle('active',a.getAttribute('href')==='#'+current);
+  });
+});
+
+// ── MOBILE MENU
+function toggleMenu(){
+  const m=document.getElementById('mobileMenu');
+  m.style.display=m.style.display==='flex'?'none':'flex';
+}
+function closeMenu(){document.getElementById('mobileMenu').style.display='none'}
+
+// ── DARK THEME TOGGLE
+function toggleTheme(){
+  const html=document.documentElement;
+  const current=html.getAttribute('data-theme');
+  const newTheme=current==='dark'?'light':'dark';
+  html.setAttribute('data-theme',newTheme);
+  localStorage.setItem('theme',newTheme);
+  const btn=document.querySelector('.theme-toggle');
+  btn.textContent=newTheme==='dark'?'☀️':'🌙';
+}
+// Load saved theme
+const savedTheme=localStorage.getItem('theme');
+if(savedTheme){
+  document.documentElement.setAttribute('data-theme',savedTheme);
+  const btn=document.querySelector('.theme-toggle');
+  if(btn)btn.textContent=savedTheme==='dark'?'☀️':'🌙';
+}
+
+// ── DONATE FORM
+let selectedPayment='mpesa';
+let selectedFreq='one-time';
+function setAmount(btn,val){
+  document.querySelectorAll('.amount-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const ci=document.getElementById('customAmount');
+  ci.style.display=val==='custom'?'block':'none';
+  if(val!=='custom')ci.value='';
+}
+function setFreq(btn,type){
+  document.querySelectorAll('.freq-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedFreq=type;
+  updateDonateButton();
+}
+function selectPay(el,method){
+  document.querySelectorAll('.pay-method').forEach(m=>m.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedPayment=method;
+  document.getElementById('mpesaInput').style.display=method==='mpesa'?'block':'none';
+}
+function updateDonateButton(){
+  const btn=document.querySelector('#donate .btn-green');
+  if(selectedFreq==='monthly'){
+    btn.textContent='❤ Donate Monthly';
+  }else{
+    btn.textContent='❤ Donate Now';
+  }
+}
+
+// ── MODALS
+function openDonateModal(){openModal('donateModal')}
+function submitContact(){openModal('contactModal')}
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')});
+});
+
+// ── SCROLL ANIMATIONS
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+},{threshold:.12});
+document.querySelectorAll('.fade-up').forEach(el=>observer.observe(el));
+
+// ── COUNTER ANIMATION
+function animateCounter(el){
+  const target=+el.dataset.target;
+  const duration=2000;
+  const step=target/duration*16;
+  let current=0;
+  const timer=setInterval(()=>{
+    current=Math.min(current+step,target);
+    el.textContent=Math.floor(current).toLocaleString();
+    if(current>=target)clearInterval(timer);
+  },16);
+}
+const counterObserver=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('.counter').forEach(animateCounter);
+      counterObserver.unobserve(e.target);
+    }
+  });
+},{threshold:.3});
+document.querySelectorAll('#home,#impact').forEach(s=>counterObserver.observe(s));
+
+// ── SMOOTH SCROLL for all anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const target=document.querySelector(a.getAttribute('href'));
+    if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+
+// ── PROGRAM DETAIL MODAL
+const programDetails={
+  education:{
+    title:'',
+    content:`
+      <h4>Education Access Program</h4>
+      <p>Our Education Access program ensures that no child is left behind due to financial constraints. We provide comprehensive support to students from underserved communities across Kenya.</p>
+      <h4>What We Provide</h4>
+      <ul>
+        <li><strong>Scholarships:</strong> Full and partial scholarships for primary, secondary, and tertiary education</li>
+        <li><strong>School Supplies:</strong> Uniforms, textbooks, stationery, and learning materials</li>
+        <li><strong>Learning Centres:</strong> After-school tutoring and homework support programs</li>
+        <li><strong>School Feeding:</strong> Nutritious meals to ensure students can focus on learning</li>
+      </ul>
+      <h4>Impact</h4>
+      <p>Over 12,000 children have received educational support through this program, with a 95% retention rate and improved academic performance across all partner schools.</p>
+    `
+  },
+  youth:{
+    title:'',
+    content:`
+      <h4>Youth Empowerment Program</h4>
+      <p>We transform young Africans from job seekers into job creators through skills training, mentorship, and entrepreneurship support. Our programs target youth aged 18-35.</p>
+      <h4>Our Programs</h4>
+      <ul>
+        <li><strong>Vocational Training:</strong> Tailoring, welding, computing, catering, carpentry, and more</li>
+        <li><strong>Business Incubation:</strong> Startup support, micro-grants, and business mentoring</li>
+        <li><strong>Digital Skills:</strong> Computer literacy, coding, and digital marketing training</li>
+        <li><strong>Leadership Development:</strong> Soft skills, financial literacy, and civic engagement</li>
+      </ul>
+      <h4>Success Stories</h4>
+      <p>3,800+ youth have graduated from our programs, with 78% securing employment or starting their own businesses within 6 months of completion.</p>
+    `
+  },
+  health:{
+    title:'',
+    content:`
+      <h4>Health Outreach Program</h4>
+      <p>Our mobile health units bring essential healthcare services to remote and underserved communities where access to medical facilities is limited or non-existent.</p>
+      <h4>Services Provided</h4>
+      <ul>
+        <li><strong>Mobile Clinics:</strong> Regular visits to rural communities with medical teams</li>
+        <li><strong>Maternal Health:</strong> Prenatal care, safe delivery support, and postnatal care</li>
+        <li><strong>Child Health:</strong> Immunizations, growth monitoring, and nutrition programs</li>
+        <li><strong>Health Education:</strong> Community workshops on hygiene, disease prevention, and family planning</li>
+      </ul>
+      <h4>Impact</h4>
+      <p>We've conducted over 500 mobile clinic visits, serving 25,000+ patients with free medical care and health education across 8 counties.</p>
+    `
+  },
+  community:{
+    title:'',
+    content:`
+      <h4>Community Support Program</h4>
+      <p>We provide immediate relief and long-term support to vulnerable families facing crisis situations, including food insecurity, water scarcity, and emergencies.</p>
+      <h4>Our Support Initiatives</h4>
+      <ul>
+        <li><strong>Food Distribution:</strong> Monthly food packages to 500+ vulnerable families</li>
+        <li><strong>Clean Water:</strong> Water purification systems and well rehabilitation projects</li>
+        <li><strong>Emergency Relief:</strong> Rapid response to natural disasters and crisis situations</li>
+        <li><strong>Shelter Support:</strong> Housing repairs and temporary shelter for displaced families</li>
+      </ul>
+      <h4>Impact</h4>
+      <p>Our community support initiatives have reached over 15,000 individuals, providing essential supplies and improving living conditions in underserved areas.</p>
+    `
+  },
+  poverty:{
+    title:'',
+    content:`
+      <h4>Poverty Reduction Program</h4>
+      <p>We tackle poverty at its roots by empowering families with economic opportunities, financial literacy, and sustainable livelihood options.</p>
+      <h4>Economic Empowerment Initiatives</h4>
+      <ul>
+        <li><strong>Microfinance:</strong> Small loans and savings groups for entrepreneurs</li>
+        <li><strong>Cooperative Farming:</strong> Agricultural support and market access for farmers</li>
+        <li><strong>Skill-Based Livelihoods:</strong> Training in income-generating activities</li>
+        <li><strong>Financial Literacy:</strong> Budgeting, saving, and investment education</li>
+      </ul>
+      <h4>Impact</h4>
+      <p>Over 2,000 families have participated in our poverty reduction programs, with an average 40% increase in household income within the first year of participation.</p>
+    `
+  }
+};
+
+function showProgramDetail(programId){
+  const program=programDetails[programId];
+  if(!program)return;
+  const content=document.getElementById('programModalContent');
+  content.innerHTML=program.content;
+  openModal('programModal');
+}
+
+// ── BLOG STORY MODAL
+const blogStories={
+  kilifi:{
+    title:'New Learning Centre Opened in Kilifi County',
+    content:`
+      <h4>New Learning Centre Opened in Kilifi County</h4>
+      <p><strong>📅 March 2025 · Education</strong></p>
+      <p>Thanks to the incredible generosity of our donors, WAKA Foundation has officially opened a new learning centre in Kilifi County that will serve 400+ children who previously had no access to formal schooling.</p>
+      <h4>The Challenge</h4>
+      <p>Kilifi County has long struggled with educational access, particularly in rural areas where schools are few and far between. Many children walk over 10 kilometers daily to reach the nearest school, and some simply don't attend at all.</p>
+      <h4>Our Solution</h4>
+      <p>The new learning centre features:</p>
+      <ul>
+        <li><strong>6 Classrooms:</strong> Fully equipped with desks, chairs, and learning materials</li>
+        <li><strong>Library:</strong> Over 2,000 books and educational resources</li>
+        <li><strong>Computer Lab:</strong> 20 computers for digital literacy training</li>
+        <li><strong>Feeding Program:</strong> Daily nutritious meals for all students</li>
+        <li><strong>Teacher Housing:</strong> On-site accommodation for 8 teachers</li>
+      </ul>
+      <h4>Impact</h4>
+      <p>In just the first month, enrollment has exceeded expectations with 420 children already registered. The community has embraced the centre, with parents volunteering to help with maintenance and security.</p>
+      <p><em>"This centre is a dream come true for our children. They now have hope for a better future."</em> — Local Chief, Kilifi County</p>
+    `
+  },
+  'mobile-clinic':{
+    title:'Mobile Health Clinic Reaches 2,000 Patients This Quarter',
+    content:`
+      <h4>Mobile Health Clinic Reaches 2,000 Patients This Quarter</h4>
+      <p><strong>📅 February 2025 · Health</strong></p>
+      <p>Our mobile health clinic has completed 18 outreach visits this quarter, serving remote communities in Turkana, Samburu, and Marsabit counties. A total of 2,000 patients received free medical care through this initiative.</p>
+      <h4>The Journey</h4>
+      <p>Our medical team travels over 3,000 kilometers each month to reach communities that have never seen a doctor before. The mobile clinic is equipped with basic diagnostic tools, medications, and a dedicated team of nurses and community health workers.</p>
+      <h4>Services Provided</h4>
+      <ul>
+        <li><strong>General Checkups:</strong> 1,200 patients received comprehensive health assessments</li>
+        <li><strong>Maternal Care:</strong> 200 pregnant women received prenatal care and education</li>
+        <li><strong>Child Immunizations:</strong> 450 children vaccinated against preventable diseases</li>
+        <li><strong>Chronic Disease Management:</strong> 150 patients with diabetes, hypertension, and HIV received ongoing care</li>
+      </ul>
+      <h4>Stories of Impact</h4>
+      <p>One memorable case was 8-year-old Aisha from Turkana, who had been suffering from a treatable skin condition for two years. Within two weeks of treatment at our mobile clinic, she was completely healed and back in school.</p>
+      <p><em>"The mobile clinic is like an angel sent from heaven. We no longer have to choose between food and medicine."</em> — Community Elder, Marsabit</p>
+    `
+  },
+  graduation:{
+    title:'120 Youth Graduate from Vocational Training Program',
+    content:`
+      <h4>120 Youth Graduate from Vocational Training Program</h4>
+      <p><strong>📅 January 2025 · Youth Empowerment</strong></p>
+      <p>Our January cohort celebrated graduation with certificates in tailoring, welding, computing, and catering. The ceremony was filled with joy, hope, and the promise of brighter futures.</p>
+      <h4>The Journey</h4>
+      <p>These 120 young men and women, aged 18-35, completed 6 months of intensive training at our vocational centres in Nairobi, Mombasa, and Kisumu. Many came from disadvantaged backgrounds, having dropped out of school or been unable to find employment.</p>
+      <h4>Program Highlights</h4>
+      <ul>
+        <li><strong>Tailoring (30 graduates):</strong> Learned garment construction, pattern making, and business skills</li>
+        <li><strong>Welding (25 graduates):</strong> Mastered arc welding, fabrication, and safety protocols</li>
+        <li><strong>Computing (35 graduates):</strong> Gained skills in Microsoft Office, basic programming, and digital literacy</li>
+        <li><strong>Catering (30 graduates):</strong> Trained in food preparation, hygiene, and restaurant management</li>
+      </ul>
+      <h4>Success Stories</h4>
+      <p>Already, 78% of graduates have secured employment or started their own businesses. Notable successes include:</p>
+      <ul>
+        <li>James from Mathare now employs 3 people in his tailoring shop</li>
+        <li>Mary from Kibera runs a successful catering business for local events</li>
+        <li>David from Kawangware was hired by a construction company</li>
+      </ul>
+      <p><em>"This program changed my life. I went from hopeless to hopeful, from unemployed to an employer."</em> — James, Tailoring Graduate</p>
+    `
+  }
+};
+
+function showBlogStory(storyId){
+  const story=blogStories[storyId];
+  if(!story)return;
+  const content=document.getElementById('blogModalContent');
+  content.innerHTML=story.content;
+  openModal('blogModal');
+}
+</script>
+</body>
+</html>
