@@ -109,11 +109,12 @@ const WAKA = {
 
     // PARTNERS
     this.store.set('partners', [
-      { id: 'PR001', name: 'UN Kenya', type: 'International NGO', contact: 'liaison@un.org', contribution: 'Technical support & training', status: 'active', since: '2022' },
-      { id: 'PR002', name: 'Kenya Red Cross', type: 'Local NGO', contact: 'partner@redcross.or.ke', contribution: 'Emergency relief collaboration', status: 'active', since: '2021' },
-      { id: 'PR003', name: 'AMREF Health Africa', type: 'Health NGO', contact: 'amref@amref.org', contribution: 'Mobile clinic co-funding', status: 'active', since: '2023' },
-      { id: 'PR004', name: 'Equity Foundation', type: 'Corporate', contact: 'foundation@equity.co.ke', contribution: 'KES 50,000 quarterly grant', status: 'active', since: '2024' },
-      { id: 'PR005', name: 'Kenya MOE', type: 'Government', contact: 'moe@education.go.ke', contribution: 'Curriculum support & accreditation', status: 'active', since: '2021' },
+      { id: 'PR001', name: 'UNICEF Kenya', type: 'International NGO', contact: 'liaison@unicef.org', contribution: 'Technical support & training', status: 'active', since: '2022', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/UNICEF_logo.svg/200px-UNICEF_logo.svg.png', sector: 'Child Welfare' },
+      { id: 'PR002', name: 'Kenya Red Cross', type: 'Local NGO', contact: 'partner@redcross.or.ke', contribution: 'Emergency relief collaboration', status: 'active', since: '2021', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Kenya_Red_Cross_Society_logo.svg/200px-Kenya_Red_Cross_Society_logo.svg.png', sector: 'Humanitarian' },
+      { id: 'PR003', name: 'AMREF Health Africa', type: 'Health NGO', contact: 'amref@amref.org', contribution: 'Mobile clinic co-funding', status: 'active', since: '2023', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Amref_Health_Africa_logo.svg/200px-Amref_Health_Africa_logo.svg.png', sector: 'Healthcare' },
+      { id: 'PR004', name: 'Equity Foundation', type: 'Corporate', contact: 'foundation@equity.co.ke', contribution: 'KES 50,000 quarterly grant', status: 'active', since: '2024', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Equity_Bank_Kenya_logo.svg/200px-Equity_Bank_Kenya_logo.svg.png', sector: 'Finance' },
+      { id: 'PR005', name: 'Kenya MOE', type: 'Government', contact: 'moe@education.go.ke', contribution: 'Curriculum support & accreditation', status: 'active', since: '2021', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/4/4b/Coat_of_arms_of_Kenya.svg/200px-Coat_of_arms_of_Kenya.svg.png', sector: 'Education' },
+      { id: 'PR006', name: 'USAID Kenya', type: 'International Agency', contact: 'info@usaid.gov', contribution: 'Development funding & technical assistance', status: 'active', since: '2020', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/US-AID-Logo.svg/200px-US-AID-Logo.svg.png', sector: 'Development' },
     ]);
 
     // FINANCIAL RECORDS
